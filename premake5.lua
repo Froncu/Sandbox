@@ -27,3 +27,5 @@ workspace "Fronge"
 			("{COPYFILE} %[Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.linktarget.directory}]") }
 
 	project "*"
+
+	startproject "FrongeEditor"
