@@ -13,7 +13,13 @@ workspace "Fronge"
 	include "Fronge"
 
 	project "FrongeEditor"
-		kind "ConsoleApp"
+		filter "configurations:not Distribute"
+			kind "ConsoleApp"
+
+		filter "configurations:Distribute"
+			kind "WindowedApp"
+
+		filter {}
 
 		dofile "Fronge/Premake/globalprj.lua"
 		dofile "Fronge/Premake/defines.lua"
