@@ -23,8 +23,8 @@ workspace "Fronge"
 		includedirs "Fronge/Source"
 		links "Fronge"
 		postbuildcommands {
-			("{COPYFILE} %[Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.buildtarget.directory}]"),
-			("{COPYFILE} %[Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}]") }
+			("xcopy %[Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.buildtarget.directory}] /S /Y"),
+			("xcopy %[Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}] /S /Y") }
 
 	project "*"
 
