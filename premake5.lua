@@ -1,0 +1,29 @@
+if _ACTION == "clean" then
+   os.rmdir ".vs"
+   os.rmdir "Output"
+   os.rmdir "Intermediate"
+
+   os.remove "*.sln"
+   os.remove "*.vcxproj"
+   os.remove "*.filters"
+   os.remove "*.user"
+end
+
+workspace "Fronge"
+	include "Fronge"
+
+	project "FrongeEditor"
+		kind "ConsoleApp"
+
+		dofile "Fronge/Premake/globalprj.lua"
+		dofile "Fronge/Premake/defines.lua"
+
+		files "Code/**"
+
+		includedirs "Fronge/Include"
+		links "Fronge"
+		postbuildcommands {
+			("{COPYFILE} %[Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.linktarget.directory}]"),
+			("{COPYFILE} %[Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.linktarget.directory}]") }
+
+	project "*"
