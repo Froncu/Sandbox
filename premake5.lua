@@ -20,7 +20,7 @@ workspace "Fronge"
 
 		files "Code/**"
 
-		includedirs "Fronge/Include"
+		includedirs "Fronge/Source"
 		links "Fronge"
 		postbuildcommands {
 			("{COPYFILE} %[Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.buildtarget.directory}]"),
