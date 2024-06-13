@@ -11,6 +11,7 @@ namespace fro
 	void FrongeEditor::run()
 	{
 		fro::Logger::info("FrongeEditor started running!");
-		while (true);
+		while (true)
+			mWindow.update();
 	}
 }
