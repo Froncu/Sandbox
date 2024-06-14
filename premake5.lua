@@ -26,11 +26,12 @@ workspace "Fronge"
 
 		files "Code/**"
 
-		includedirs "Fronge/Source"
+		includedirs "Fronge/Fronge/Source"
 		links "Fronge"
+		links "FrongeEntry"
 		postbuildcommands {
-			("xcopy %[Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.buildtarget.directory}] /S /Y"),
-			("xcopy %[Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}] /S /Y") }
+			("xcopy %[Fronge/Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.buildtarget.directory}] /S /Y"),
+			("xcopy %[Fronge/Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}] /S /Y") }
 
 	project "*"
 
