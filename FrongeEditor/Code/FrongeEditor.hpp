@@ -20,11 +20,11 @@ namespace fro
 		virtual void run() override;
 
 	private:
-		EventListener<WindowCloseEvent&> mOnWindowClose
+		EventListener<std::uint32_t> mOnWindowClose
 		{
-			[this](auto&& event)
+			[this](auto&& windowID)
 			{
-				if (event.mID == mMainWindow.mID)
+				if (windowID == mMainWindow.mID)
 					mIsRunning = false;
 			}
 		};
