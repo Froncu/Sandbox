@@ -7,4 +7,10 @@ namespace fro
 		fro::Logger::info("FrongeEditor created!");
 		return std::make_unique<FrongeEditor>();
 	}
+
+	void FrongeEditor::run()
+	{
+		while (true)
+			SystemEventManager::pollEvents();
+	}
 }

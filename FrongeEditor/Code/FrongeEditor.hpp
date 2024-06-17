@@ -16,6 +16,11 @@ namespace fro
 
 		FrongeEditor& operator=(FrongeEditor const&) = default;
 		FrongeEditor& operator=(FrongeEditor&&) noexcept = default;
+
+		virtual void run() override;
+
+	private:
+		Window mWindow{ "Fronge Editor", 1280, 720 };
 	};
 }
 
