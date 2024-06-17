@@ -10,7 +10,7 @@ namespace fro
 
 	FrongeEditor::FrongeEditor()
 	{
-		SystemEventManager::mOnWindowClose.addListener(mOnWindowClose);
+		mMainWindow.mWindowClose.addListener(mOnMainWindowClose);
 	}
 
 	void FrongeEditor::run()
