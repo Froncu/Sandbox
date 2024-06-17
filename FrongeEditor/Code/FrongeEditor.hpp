@@ -8,7 +8,7 @@ namespace fro
 	class FrongeEditor final : public Application
 	{
 	public:
-		FrongeEditor() = default;
+		FrongeEditor();
 		FrongeEditor(FrongeEditor const&) = default;
 		FrongeEditor(FrongeEditor&&) noexcept = default;
 
@@ -20,7 +20,17 @@ namespace fro
 		virtual void run() override;
 
 	private:
-		Window mWindow{ "Fronge Editor", 1280, 720 };
+		EventListener<WindowCloseEvent&> mOnWindowClose
+		{
+			[this](auto&& event)
+			{
+				if (event.mID == mMainWindow.mID)
+					mIsRunning = false;
+			}
+		};
+
+		Window mMainWindow{ "Fronge Editor", 1280, 720 };
+		bool mIsRunning{ true };
 	};
 }
 

@@ -8,9 +8,14 @@ namespace fro
 		return std::make_unique<FrongeEditor>();
 	}
 
+	FrongeEditor::FrongeEditor()
+	{
+		SystemEventManager::mOnWindowClose.addListener(mOnWindowClose);
+	}
+
 	void FrongeEditor::run()
 	{
-		while (true)
+		while (mIsRunning)
 			SystemEventManager::pollEvents();
 	}
 }
