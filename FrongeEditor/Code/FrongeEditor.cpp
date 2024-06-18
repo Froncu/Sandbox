@@ -16,6 +16,6 @@ namespace fro
 	void FrongeEditor::run()
 	{
 		while (mIsRunning)
-			SystemEventManager::pollEvents();
+			GlobalEventManager::pollEvents();
 	}
 }
