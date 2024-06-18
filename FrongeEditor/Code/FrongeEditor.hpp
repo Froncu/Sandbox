@@ -25,6 +25,7 @@ namespace fro
 			[this]()
 			{
 				mIsRunning = false;
+				return false;
 			}
 		};
 
@@ -32,7 +33,7 @@ namespace fro
 		{
 			[this](auto&& event)
 			{
-				mLayerStack.onEvent(event);
+				return mLayerStack.mOnEvent(event);
 			}
 		};
 

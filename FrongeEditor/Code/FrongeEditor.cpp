@@ -1,8 +1,5 @@
 #include "FrongeEditor.hpp"
 
-#include "TestLayer.hpp"
-#include "TestLayer2.hpp"
-
 namespace fro
 {
 	std::unique_ptr<Application> createApplication()
@@ -13,11 +10,8 @@ namespace fro
 
 	FrongeEditor::FrongeEditor()
 	{
-		GlobalEventManager::mSystemEvent.addListener(mOnEvent);
 		mMainWindow.mWindowCloseEvent.addListener(mOnMainWindowCloseEvent);
-
-		mLayerStack.pushLayer(std::make_unique<TestLayer>());
-		mLayerStack.pushLayer(std::make_unique<TestLayer2>());
+		GlobalEventManager::mSystemEvent.addListener(mOnEvent);
 	}
 
 	void FrongeEditor::run()
