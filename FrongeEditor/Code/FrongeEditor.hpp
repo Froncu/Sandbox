@@ -29,16 +29,7 @@ namespace fro
 			}
 		};
 
-		EventListener<Event&> mOnEvent
-		{
-			[this](auto&& event)
-			{
-				return mLayerStack.mOnEvent(event);
-			}
-		};
-
 		Window mMainWindow{ "Fronge Editor", 1280, 720 };
-		LayerStack mLayerStack{};
 
 		bool mIsRunning{ true };
 	};

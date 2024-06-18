@@ -11,7 +11,6 @@ namespace fro
 	FrongeEditor::FrongeEditor()
 	{
 		mMainWindow.mWindowCloseEvent.addListener(mOnMainWindowCloseEvent);
-		GlobalEventManager::mSystemEvent.addListener(mOnEvent);
 	}
 
 	void FrongeEditor::run()
