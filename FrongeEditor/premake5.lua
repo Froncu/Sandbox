@@ -21,8 +21,7 @@ project "FrongeEditor"
 
 	postbuildcommands {
 		("xcopy %[../Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.buildtarget.directory}] /S /Y"),
-		("xcopy %[../Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}] /S /Y"),
-		("xcopy %[../Fronge/Output/" .. outputdir .. "/*.manifest] %[%{cfg.buildtarget.directory}] /S /Y") }
+		("xcopy %[../Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}] /S /Y") }
 
 	filter {}
 
