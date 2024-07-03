@@ -1,5 +1,9 @@
 #include "FrongeEditor.hpp"
 
+#if defined FRO_DEBUG
+	#include <vld.h>
+#endif
+
 namespace fro
 {
 	std::unique_ptr<Application> createApplication()
