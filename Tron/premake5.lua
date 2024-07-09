@@ -25,4 +25,6 @@ project "Tron"
 
 	filter {}
 
+	dofile "../External/vld/premake5.lua"
+
 project "*"

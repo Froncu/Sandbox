@@ -1,0 +1,24 @@
+Visual Leak Detector Version 2.5.9 installed.
+    Outputting the report to C:\Users\jakub\OneDrive - Hogeschool West-Vlaanderen\Desktop FroncuLT\DAE\Semester 4a\Programming 4\Files\FrongeEditorDAE\Tron\memory_leak_report.txt
+WARNING: Visual Leak Detector detected memory leaks!
+---------- Block 30 at 0x0000000057A96C80: 4 bytes ----------
+  Leak Hash: 0xC47B3AD1, Count: 1, Total 4 bytes
+  Call Stack (TID 25308):
+    ucrtbased.dll!malloc()
+    D:\a\_work\1\s\src\vctools\crt\vcstartup\src\heap\new_scalar.cpp (36): Tron.exe!operator new() + 0xA bytes
+    C:\Users\jakub\OneDrive - Hogeschool West-Vlaanderen\Desktop FroncuLT\DAE\Semester 4a\Programming 4\Files\FrongeEditorDAE\Fronge\FrongeEntry\Source\Entry.cpp (16): Tron.exe!SDL_main() + 0x17 bytes
+    C:\projects\SDL\src\main\windows\SDL_windows_main.c (80): Tron.exe!main_getcmdline() + 0xC bytes
+    D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl (79): Tron.exe!invoke_main()
+    D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl (288): Tron.exe!__scrt_common_main_seh() + 0x5 bytes
+    D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl (331): Tron.exe!__scrt_common_main()
+    D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_main.cpp (17): Tron.exe!mainCRTStartup()
+    KERNEL32.DLL!BaseThreadInitThunk() + 0x1D bytes
+    ntdll.dll!RtlUserThreadStart() + 0x28 bytes
+  Data:
+    00 00 00 00                                                  ........ ........
+
+
+Visual Leak Detector detected 1 memory leak (56 bytes).
+Largest number used: 29184 bytes.
+Total allocations: 53823 bytes.
+Visual Leak Detector is now exiting.

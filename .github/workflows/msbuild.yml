@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        configuration: [Debug, Release, Distribute]
+        configuration: [Debug, Release Console, Release]
         platform: [x64, Win32]
 
     steps:
@@ -33,4 +33,4 @@ jobs:
 
     - name: Build program
       working-directory: ${{ github.workspace }}
-      run: msbuild /m /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} ${{ env.solution }}
+      run: msbuild /m /p:Configuration="${{ matrix.configuration }}" /p:Platform="${{ matrix.platform }}" ${{ env.solution }}
