@@ -11,6 +11,6 @@ end
 
 workspace "Fronge"
 	include "Fronge"
-	include "FrongeEditor"
+	include "Tron"
 
-	startproject "FrongeEditor"
+	startproject "Tron"

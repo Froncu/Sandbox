@@ -5,17 +5,17 @@
 
 namespace fro
 {
-	class FrongeEditor final : public Application
+	class Tron final : public Application
 	{
 	public:
-		FrongeEditor();
-		FrongeEditor(FrongeEditor const&) = default;
-		FrongeEditor(FrongeEditor&&) noexcept = default;
+		Tron();
+		Tron(Tron const&) = default;
+		Tron(Tron&&) noexcept = default;
 
-		virtual ~FrongeEditor() override = default;
+		virtual ~Tron() override = default;
 
-		FrongeEditor& operator=(FrongeEditor const&) = default;
-		FrongeEditor& operator=(FrongeEditor&&) noexcept = default;
+		Tron& operator=(Tron const&) = default;
+		Tron& operator=(Tron&&) noexcept = default;
 
 		virtual void run() override;
 
@@ -29,7 +29,7 @@ namespace fro
 			}
 		};
 
-		Window mMainWindow{ "Fronge Editor", 1280, 720 };
+		Window mMainWindow{ "Tron", 1280, 720 };
 		Renderer mRenderer{ mMainWindow, { 512, 480 }, Renderer::ScalingMode::aspectRatio };
 		Texture mTexture{ { mRenderer, "test.png" }};
 

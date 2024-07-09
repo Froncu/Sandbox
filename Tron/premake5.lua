@@ -1,8 +1,8 @@
-project "FrongeEditor"
-	filter "configurations:not Distribute"
+project "Tron"
+	filter "configurations:not Release"
 		kind "ConsoleApp"
 
-	filter "configurations:Distribute"
+	filter "configurations:Release"
 		kind "WindowedApp"
 
 	filter {}
