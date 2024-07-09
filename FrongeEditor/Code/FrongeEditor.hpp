@@ -30,6 +30,8 @@ namespace fro
 		};
 
 		Window mMainWindow{ "Fronge Editor", 1280, 720 };
+		Renderer mRenderer{ mMainWindow, { 512, 480 }, Renderer::ScalingMode::aspectRatio };
+		Texture mTexture{ { mRenderer, "test.png" }};
 
 		bool mIsRunning{ true };
 	};
