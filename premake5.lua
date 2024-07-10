@@ -10,7 +10,7 @@ if _ACTION == "clean" then
 end
 
 workspace "Fronge"
-	include "Fronge"
+	include "External/Fronge"
 	include "Tron"
 
 	startproject "Tron"
