@@ -10,7 +10,7 @@ namespace fro
 {
 	std::unique_ptr<Application> createApplication()
 	{
-		fro::Logger::info("Tron created!");
+		Logger::info("created a Tron application!");
 
 		Audio::playMusic({ "test.mp3" });
 
@@ -44,7 +44,7 @@ namespace fro
 
 			GlobalEventManager::pollEvents();
 			mRenderer.clear(0.4f, 0.4f, 0.4f);
-			mRenderer.renderTexture(mTexture, math::createTranslator(32.0, 32.0), { 8, 0, 0, 16 });
+			mRenderer.renderTexture(mTexture, math::createTranslator(1.0 * mTexture.getWidth(), 1.0 * mTexture.getHeight()));
 			mRenderer.present();
 		}
 	}

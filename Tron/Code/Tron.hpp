@@ -30,8 +30,8 @@ namespace fro
 		};
 
 		Window mMainWindow{ "Tron", 1280, 720 };
-		Renderer mRenderer{ mMainWindow, { 512, 480 }, Renderer::ScalingMode::aspectRatio };
-		Texture mTexture{ { mRenderer, "test.png" }};
+		Renderer mRenderer{ mMainWindow, {}, Renderer::ScalingMode::aspectRatio };
+		Texture mTexture{ mRenderer, { "test.ttf", 128 }, "wassup" };
 
 		bool mIsRunning{ true };
 	};
