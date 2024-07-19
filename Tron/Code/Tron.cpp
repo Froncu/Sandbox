@@ -1,50 +1,58 @@
 #include "Tron.hpp"
 
-#include <numeric>
-
 #if defined FRO_DEBUG
 	#include <vld.h>
 #endif
 
 namespace fro
 {
-	std::unique_ptr<Application> createApplication()
+	std::unique_ptr<fro::Application> createApplication()
 	{
-		Logger::info("created a Tron application!");
-
-		Audio::playMusic({ "test.mp3" });
-
-		return std::make_unique<Tron>();
+		return std::make_unique<tron::Tron>();
 	}
+}
 
+namespace tron
+{
 	Tron::Tron()
 	{
-		mMainWindow.mWindowCloseEvent.addListener(mOnMainWindowCloseEvent);
+		using namespace fro;
+
+		mMainWindow.mCloseEvent.addListener(mOnMainWindowCloseEvent);
+		SystemEventManager::mInputEvent.addListener(mOnInputEvent);
+
+		InputManager::bindActionToInput("up", Key::S);
+		InputManager::bindActionToInput("down", Key::W);
+		InputManager::bindActionToInput("left", Key::A);
+		InputManager::bindActionToInput("right", Key::D);
+
+		Logger::info("created Tron!");
+	}
+
+	Tron::~Tron()
+	{
+		fro::Logger::info("destroyed Tron!");
 	}
 
 	void Tron::run()
 	{
-		auto t1{ std::chrono::steady_clock::now() };
-		std::vector<double> frameTimes{};
-		double elapsedSeconds{};
+		using namespace fro;
+
+		static auto t1{ std::chrono::steady_clock::now() };
 		while (mIsRunning)
 		{
 			auto const t2{ std::chrono::steady_clock::now() };
 			double const deltaSeconds{ std::chrono::duration<double>(t2 - t1).count() };
-			frameTimes.push_back(deltaSeconds);
 			t1 = t2;
 
-			elapsedSeconds += deltaSeconds;
-			if (elapsedSeconds >= 1.0)
-			{
-				elapsedSeconds = 0;
-				Logger::info(1.0 / (std::reduce(frameTimes.begin(), frameTimes.end()) / frameTimes.size()));
-				frameTimes.clear();
-			}
+			InputManager::processInputContinous();
+			SystemEventManager::pollEvents();
 
-			GlobalEventManager::pollEvents();
-			mRenderer.clear(0.4f, 0.4f, 0.4f);
-			mRenderer.renderTexture(mTexture, math::createTranslator(1.0 * mTexture.getWidth(), 1.0 * mTexture.getHeight()));
+			Vector2<double> strength{ InputManager::getActionStrengthAxis2D("right", "left", "up", "down") };
+			mTextureTransformation = mTextureTransformation * math::createTranslator(strength * deltaSeconds * 64);
+
+			mRenderer.clear();
+			mRenderer.renderTexture(mTexture, mTextureTransformation);
 			mRenderer.present();
 		}
 	}
