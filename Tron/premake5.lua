@@ -23,8 +23,6 @@ project "Tron"
 		("xcopy %[../External/Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.buildtarget.directory}] /S /Y"),
 		("xcopy %[../External/Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}] /S /Y") }
 
-	filter {}
-
 	dofile "../External/vld/premake5.lua"
 
 project "*"
