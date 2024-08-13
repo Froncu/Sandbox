@@ -45,13 +45,13 @@ namespace tron
 
 		PhysicsSystem::setGravity({});
 
-		ResourceManager::store<Texture>("redTank", mRenderer, Surface{ "Data/redTank.png" });
-		ResourceManager::store<Texture>("blueTank", mRenderer, Surface{ "Data/blueTank.png" });
-		ResourceManager::store<Texture>("canon", mRenderer, Surface{ "Data/canon.png" });
-		ResourceManager::store<Texture>("bullet", mRenderer, Surface{ "Data/bullet.png" });
-		ResourceManager::store<Texture>("level1", mRenderer, Surface{ "Data/level1.png" });
-		ResourceManager::store<Texture>("level2", mRenderer, Surface{ "Data/level2.png" });
-		ResourceManager::store<Texture>("level3", mRenderer, Surface{ "Data/level3.png" });
+		ResourceManager::store<Texture>("redTank", mRenderer, Surface{ "Data/Sprites/redTank.png" });
+		ResourceManager::store<Texture>("blueTank", mRenderer, Surface{ "Data/Sprites/blueTank.png" });
+		ResourceManager::store<Texture>("canon", mRenderer, Surface{ "Data/Sprites/canon.png" });
+		ResourceManager::store<Texture>("bullet", mRenderer, Surface{ "Data/Sprites/bullet.png" });
+		ResourceManager::store<Texture>("level1", mRenderer, Surface{ "Data/Sprites/level1.png" });
+		ResourceManager::store<Texture>("level2", mRenderer, Surface{ "Data/Sprites/level2.png" });
+		ResourceManager::store<Texture>("level3", mRenderer, Surface{ "Data/Sprites/level3.png" });
 
 		SceneManager::setActiveScene(*mScene1);
 
@@ -63,7 +63,7 @@ namespace tron
 			auto rigidbody{ worldBorder->attachComponent<Rigidbody>() };
 			rigidbody->setType(Rigidbody::Type::STATIC);
 
-			auto worldColliders{ SVGParser::parse("Data/level1.svg") };
+			auto worldColliders{ SVGParser::parse("Data/SVG/level1.svg") };
 			ResourceManager::store<NavigationMesh>("level1Mesh", worldColliders).translate({ 0.0, 64.0 });
 
 			for (Polygon<double>& polygon : worldColliders)
@@ -84,7 +84,7 @@ namespace tron
 			rigidbody = worldBorder->attachComponent<Rigidbody>();
 			rigidbody->setType(Rigidbody::Type::STATIC);
 
-			worldColliders = SVGParser::parse("Data/level2.svg");
+			worldColliders = SVGParser::parse("Data/SVG/level2.svg");
 			ResourceManager::store<NavigationMesh>("level2Mesh", worldColliders).translate({ 0.0, 64.0 });
 
 			for (Polygon<double>& polygon : worldColliders)
@@ -105,7 +105,7 @@ namespace tron
 			rigidbody = worldBorder->attachComponent<Rigidbody>();
 			rigidbody->setType(Rigidbody::Type::STATIC);
 
-			worldColliders = SVGParser::parse("Data/level3.svg");
+			worldColliders = SVGParser::parse("Data/SVG/level3.svg");
 			ResourceManager::store<NavigationMesh>("level3Mesh", worldColliders).translate({ 0.0, 64.0 });
 
 			for (Polygon<double>& polygon : worldColliders)
