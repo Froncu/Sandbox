@@ -1,4 +1,5 @@
 #include "Components/BulletBouncer.hpp"	
+#include "Components/Enemy.hpp"
 #include "Components/EnemyMoveAI.hpp"
 #include "Components/Navigator.hpp"
 #include "Components/PlayerCanonShooter.hpp"
@@ -34,6 +35,8 @@ namespace tron
 				collider.setShape(polygon);
 				collider.setRestitution(1.0);
 				collider.setFriction(0.0);
+				collider.setCategoryBits(fro::createBitfield(0ull));
+				collider.setMaskBits(fro::createBitfield(1ull, 2ull));
 			};
 
 			return entity;
@@ -56,6 +59,8 @@ namespace tron
 			collider.setShape(fro::Circle<double>{ { -3.0, 0.0 }, 16.0 });
 			collider.setDensity(1.0);
 			collider.setSensor(true);
+			collider.setCategoryBits(fro::createBitfield(3ull));
+			collider.setMaskBits(fro::createBitfield(1ull, 2ull, 4ull));
 
 			entity.attachComponent<Navigator>();
 
@@ -102,7 +107,8 @@ namespace tron
 			collider.setShape(fro::Circle<double>{ .radius{ 2.0 } });
 			collider.setDensity(1.0);
 			collider.setRestitution(1.0);
-			collider.setGroupIndex(-1);
+			collider.setCategoryBits(fro::createBitfield(1ull));
+			collider.setMaskBits(fro::createBitfield(0ull, 3ull, 4ull));
 
 			entity.attachComponent<BulletBouncer>();
 
@@ -125,12 +131,15 @@ namespace tron
 			fro::Collider& collider{ rigidbody.addCollider() };
 			collider.setShape(fro::Rectangle<double>{ .width{ 32.0 }, .height{ 32.0 } });
 			collider.setDensity(1.0);
+			collider.setCategoryBits(fro::createBitfield(4ull));
+			collider.setMaskBits(fro::createBitfield(1ull, 3ull));
 
 			EnemyMoveAI& enemyMoveAI{ *entity.attachComponent<EnemyMoveAI>() };
 			enemyMoveAI.target = redTankTransform;
 			enemyMoveAI.targetPosition = redTankTransform->world().getTranslation();
 
 			entity.attachComponent<Navigator>();
+			entity.attachComponent<Enemy>();
 
 			return entity;
 		}
