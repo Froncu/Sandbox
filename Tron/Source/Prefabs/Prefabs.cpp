@@ -1,3 +1,4 @@
+#include "Components/BulletBouncer.hpp"	
 #include "Components/EnemyMoveAI.hpp"
 #include "Components/Navigator.hpp"
 #include "Components/PlayerCanonShooter.hpp"
@@ -78,7 +79,37 @@ namespace tron
 			return entity;
 		}
 
-		fro::Entity blueTankAI(fro::Vector2<double> const position, fro::Reference<fro::Transform> const redTankTransform)
+		fro::Entity redTankBullet(fro::Reference<fro::Transform const> const canonTransform)
+		{
+			fro::Entity entity{};
+
+			fro::Vector2<double> const canonTranslation{ canonTransform->world().getTranslation() };
+			double const canonRotation{ canonTransform->world().getRotation() };
+			fro::Vector2<double> const direction{ std::cos(canonRotation), std::sin(canonRotation) };
+
+			entity.attachComponent<fro::Transform>()->setLocalTranslation(canonTranslation + direction * 20.0);
+
+			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
+			sprite.texture = fro::ResourceManager::find<fro::Texture>("bullet");
+			sprite.layer = 2;
+
+			fro::Rigidbody& rigidbody{ *entity.attachComponent<fro::Rigidbody>() };
+			rigidbody.setType(fro::Rigidbody::Type::DYNAMIC);
+			rigidbody.setFixedRotation(true);
+			rigidbody.setLinearVelocity(direction * 256.0);
+
+			fro::Collider& collider{ rigidbody.addCollider() };
+			collider.setShape(fro::Circle<double>{ .radius{ 2.0 } });
+			collider.setDensity(1.0);
+			collider.setRestitution(1.0);
+			collider.setGroupIndex(-1);
+
+			entity.attachComponent<BulletBouncer>();
+
+			return entity;
+		}
+
+		fro::Entity blueTankAI(fro::Vector2<double> const position, fro::Reference<fro::Transform const> const redTankTransform)
 		{
 			fro::Entity entity{};
 
