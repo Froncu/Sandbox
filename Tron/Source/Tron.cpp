@@ -73,10 +73,10 @@ namespace tron
 
 		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 0, 0 }, transform)))->
 			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-
+		
 		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 600, 600 }, transform)))->
 			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-
+		
 		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 100, 400 }, transform)))->
 			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
 

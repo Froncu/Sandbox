@@ -17,18 +17,36 @@ namespace tron
 			double& elapsedSeconds{ enemyMoveAI->elapsedSeconds };
 			elapsedSeconds += deltaSeconds;
 
-			double const maxElapsedSeconds{ enemyMoveAI->maxElapsedSeconds };
-
+			bool& isChasing{ enemyMoveAI->isChasing };
 			fro::Vector2<double> const translation{ transform->world().getTranslation() };
 			fro::Vector2<double>& targetPosition{ enemyMoveAI->targetPosition };
+
+			if (double& maxElapsedSeconds{ enemyMoveAI->maxElapsedSeconds };
+				elapsedSeconds >= maxElapsedSeconds)
+			{
+				elapsedSeconds -= maxElapsedSeconds;
+
+				int constexpr max{ 15 };
+				int constexpr min{ 5 };
+
+				maxElapsedSeconds = static_cast<double>(std::rand() % (max - min + 1)) + min;
+				isChasing = !isChasing;
+
+				if (not isChasing)
+					targetPosition = translation;
+			}
+
 			auto const& target{ enemyMoveAI->target };
 
-			if (double constexpr epsilon{ 16.0 };
-				elapsedSeconds >= maxElapsedSeconds or 
-				((targetPosition - translation).getMagnitude() < epsilon and target.valid()))
-			{
-				elapsedSeconds = 0.0;
+			if (isChasing and target.valid())
 				targetPosition = target->world().getTranslation();
+			else if (double constexpr epsilon{ 64.0 };
+				(targetPosition - translation).getMagnitude() < epsilon)
+			{
+				do
+				{
+					targetPosition = nodes[std::rand() % nodes.size()].first;
+				} while ((targetPosition - translation).getMagnitude() < 128.0);
 			}
 
 			if (navigator->isOnNode())

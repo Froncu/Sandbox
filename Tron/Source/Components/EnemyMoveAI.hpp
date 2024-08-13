@@ -11,7 +11,8 @@ namespace tron
 		fro::Reference<fro::Transform const> target{};
 		fro::Vector2<double> targetPosition{};
 		double elapsedSeconds{};
-		double maxElapsedSeconds{ 10.0 };
+		double maxElapsedSeconds{};
+		bool isChasing{ true };
 	};
 }
 
