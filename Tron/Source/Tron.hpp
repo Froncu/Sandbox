@@ -83,6 +83,9 @@ namespace tron
 		fro::Reference<fro::Scene> mScene3{ fro::SceneManager::addScene() };
 		fro::Reference<fro::Entity> mTank{ mScene1->addEntity() };
 		fro::Reference<fro::Entity> mCanon{ mScene1->addEntity() };
+		fro::Reference<fro::Entity> mEnemy1{ mScene1->addEntity() };
+		fro::Reference<fro::Entity> mEnemy2{ mScene1->addEntity() };
+		fro::Reference<fro::Entity> mEnemy3{ mScene1->addEntity() };
 	};
 }
 

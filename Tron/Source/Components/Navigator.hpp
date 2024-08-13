@@ -27,8 +27,9 @@ namespace tron
 
 		FRO_NODISCARD fro::Reference<NavigationMesh const> getNavigationMesh() const;
 		FRO_NODISCARD std::size_t getClosestNodeIndex() const;
+		FRO_NODISCARD bool isOnNode() const;
 
-		fro::Vector2<double> desiredDirection{};
+		fro::Vector2<double> mDesiredDirection{};
 		double mVelocity{ 64.0 };
 
 	private:

@@ -42,9 +42,9 @@ namespace tron
 
 			fro::Vector2<double> const desiredDirection
 			{
-				std::abs(navigator->desiredDirection.x) > std::abs(navigator->desiredDirection.y) ?
-				fro::Vector2<double>{ std::round(navigator->desiredDirection.x), 0.0 } :
-				fro::Vector2<double>{ 0.0, std::round(navigator->desiredDirection.y) }
+				std::abs(navigator->mDesiredDirection.x) > std::abs(navigator->mDesiredDirection.y) ?
+				fro::Vector2<double>{ std::round(navigator->mDesiredDirection.x), 0.0 } :
+				fro::Vector2<double>{ 0.0, std::round(navigator->mDesiredDirection.y) }
 			};
 
 			fro::Vector2<double> direction;
