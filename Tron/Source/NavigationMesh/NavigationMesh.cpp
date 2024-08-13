@@ -2,70 +2,6 @@
 
 namespace tron
 {
-	//std::vector<NavigationMesh::EdgeType> NavigationMesh::getEdges(
-	//	std::vector<fro::Vector2<double>> const& points,
-	//	std::vector<fro::Polygon<double>> const& polygons)
-	//{
-	//	using namespace fro;
-
-	//	std::vector<EdgeType> edges{};
-
-	//	if (points.empty())
-	//		return edges;
-
-	//	auto element{ points.begin() };
-	//	while (true)
-	//	{
-	//		Vector2<double> const point1{ *element++ };
-
-	//		if (element == points.end())
-	//			break;
-
-	//		Vector2<double> const point2{ *element };
-
-	//		if (point1.x not_eq point2.x)
-	//			continue;
-
-	//		if (not doesIntersectAnyPolygon(point1, point2, polygons))
-	//			edges.emplace_back(point1, point2);
-	//	}
-
-	//	element = points.begin();
-	//	while (element not_eq points.end())
-	//	{
-	//		Vector2<double> const point1{ *element };
-
-	//		element = std::find_if(element + 1, points.end(),
-	//			[point1](Vector2<double> const point2)
-	//			{
-	//				return point1.y == point2.y;
-	//			});
-
-	//		if (element == points.end())
-	//		{
-	//			element = points.begin();
-	//			auto closestNextElement{ points.end() };
-	//			while (element not_eq points.end())
-	//			{
-	//				if (point1.y < element->y and (closestNextElement == points.end() or closestNextElement->y > element->y))
-	//					closestNextElement = element;
-
-	//				++element;
-	//			}
-
-	//			element = closestNextElement;
-	//			continue;
-	//		}
-
-	//		Vector2<double> const point2{ *element };
-
-	//		if (not doesIntersectAnyPolygon(point1, point2, polygons))
-	//			edges.emplace_back(point1, point2);
-	//	}
-
-	//	return edges;
-	//}
-
 	std::vector<fro::Vector2<double>> NavigationMesh::getPoints(std::vector<fro::Polygon<double>> const& polygons)
 	{
 		using namespace fro;
@@ -204,94 +140,15 @@ namespace tron
 		return nodes;
 	}
 
-	bool NavigationMesh::doLinesIntersect(fro::Vector2<double> const p1,
-		fro::Vector2<double> const p2,
-		fro::Vector2<double> const q1,
-		fro::Vector2<double> const q2)
+	NavigationMesh::NavigationMesh(std::vector<fro::Polygon<double>> polygons)
+		: mPolygons{ std::move(polygons) }
+		, mNodes{ calculateNodes(mPolygons) }
 	{
-		// NOTE: I completely forgot how line intersection detection works,
-		// so I have no idea what's happening here no time left to dig into it,
-		// thanks ChatGPT!
-
-		using namespace fro;
-
-		Vector2<double> const p2p1{ p1 - p2 };
-		Vector2<double> const q2q1{ q1 - q2 };
-		Vector2<double> const p1q1{ q1 - p1 };
-
-		double const cross1{ p2p1.getCross(q2q1) };
-		double const cross2{ p2p1.getCross(p1q1) };
-		double const cross3{ q2q1.getCross(p1q1) };
-
-		double constexpr epsilon{ std::numeric_limits<double>::epsilon() };
-
-		if (std::abs(cross1) < epsilon)
-		{
-			auto const isBetween
-			{
-				[](double const a, double const b, double const c)
-				{
-					return std::min(a, b) <= c and c <= std::max(a, b);
-				}
-			};
-
-			return
-				(isBetween(p1.x, p2.x, q1.x) and isBetween(p1.y, p2.y, q1.y)) or
-				(isBetween(p1.x, p2.x, q2.x) and isBetween(p1.y, p2.y, q2.y)) or
-				(isBetween(q1.x, q2.x, p1.x) and isBetween(q1.y, q2.y, p1.y)) or
-				(isBetween(q1.x, q2.x, p2.x) and isBetween(q1.y, q2.y, p2.y));
-		}
-		else
-		{
-			double const inverseCross1{ 1.0 / cross1 };
-			double const t{ cross3 * inverseCross1 };
-			double const u{ cross2 * inverseCross1 };
-
-			return
-				t >= 0.0 and
-				t <= 1.0 and
-				u >= 0.0 and
-				u <= 1.0;
-		}
 	}
 
-	bool NavigationMesh::doesIntersectPolygon(fro::Vector2<double> const p1,
-		fro::Vector2<double> const p2,
-		fro::Polygon<double> const& polygon)
+	std::vector<fro::Polygon<double>> const& NavigationMesh::getPolygons() const
 	{
-		std::size_t const vertexCount{ polygon.vertices.size() };
-
-		for (std::size_t index{}; index < vertexCount; ++index)
-		{
-			using namespace fro;
-
-			if (doLinesIntersect(p1,
-				p2,
-				polygon.vertices[index],
-				polygon.vertices[(index + 1) % vertexCount]))
-				return true;
-		}
-
-		return false;
-	}
-
-	bool NavigationMesh::doesIntersectAnyPolygon(fro::Vector2<double> const p1,
-		fro::Vector2<double> const p2,
-		std::vector<fro::Polygon<double>> const& polygons)
-	{
-		using namespace fro;
-
-		for (Polygon<double> const& polygon : polygons)
-			if (doesIntersectPolygon(p1, p2, polygon))
-				return true;
-
-		return false;
-	}
-
-
-	NavigationMesh::NavigationMesh(std::vector<fro::Polygon<double>> const& polygons)
-		: mNodes{ calculateNodes(polygons) }
-	{
+		return mPolygons;
 	}
 
 	std::vector<NavigationMesh::NodeType> const& NavigationMesh::getNodes() const
@@ -301,6 +158,10 @@ namespace tron
 
 	void NavigationMesh::translate(fro::Vector2<double> const translation)
 	{
+		for (fro::Polygon<double>& polygon : mPolygons)
+			for (fro::Vector2<double>& vertex : polygon.vertices)
+				vertex += translation;
+
 		for (auto&& [point, availableIndices] : mNodes)
 			point += translation;
 	}
