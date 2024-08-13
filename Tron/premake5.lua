@@ -21,7 +21,9 @@ project "Tron"
 
 	postbuildcommands {
 		("xcopy %[../External/Fronge/Output/" .. outputdir .. "/*.dll] %[%{cfg.buildtarget.directory}] /S /Y"),
-		("xcopy %[../External/Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}] /S /Y") }
+		("xcopy %[../External/Fronge/Output/" .. outputdir .. "/*.pdb] %[%{cfg.buildtarget.directory}] /S /Y"),
+		"mkdir %[%{cfg.buildtarget.directory}Data]",
+		"xcopy %[Data/.] %[%{cfg.buildtarget.directory}Data] /S /Y" }
 
 	dofile "../External/vld/premake5.lua"
 
