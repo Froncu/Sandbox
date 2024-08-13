@@ -10,8 +10,8 @@ project "Tron"
 	dofile "../External/Fronge/Premake/globalprj.lua"
 	dofile "../External/Fronge/Premake/defines.lua"
 
-	files "Code/**"
-	includedirs "../External/Fronge/Fronge/Source"
+	files "Source/**"
+	includedirs { "Source", "../External/Fronge/Fronge/Source" }
 	targetdir ("../Output/" .. outputdir)
 	objdir ("../Intermediate/" .. outputdir)
 
