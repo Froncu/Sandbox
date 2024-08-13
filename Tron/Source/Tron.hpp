@@ -3,6 +3,8 @@
 
 #include "Fronge.hpp"
 
+#include "Prefabs/Prefabs.hpp"
+
 namespace tron
 {
 	class Tron final : public fro::Application
@@ -43,6 +45,10 @@ namespace tron
 				[this](fro::GamepadConnectedEvent const& event)
 				{
 					using namespace fro;
+
+					if (mGamePad.get())
+						return false;
+
 					mGamePad = std::make_unique<Gamepad>(event.deviceID);
 
 					auto const ID{ mGamePad->getID() };
@@ -81,11 +87,10 @@ namespace tron
 		fro::Reference<fro::Scene> mScene1{ fro::SceneManager::addScene() };
 		fro::Reference<fro::Scene> mScene2{ fro::SceneManager::addScene() };
 		fro::Reference<fro::Scene> mScene3{ fro::SceneManager::addScene() };
+
 		fro::Reference<fro::Entity> mTank{ mScene1->addEntity() };
 		fro::Reference<fro::Entity> mCanon{ mScene1->addEntity() };
-		fro::Reference<fro::Entity> mEnemy1{ mScene1->addEntity() };
-		fro::Reference<fro::Entity> mEnemy2{ mScene1->addEntity() };
-		fro::Reference<fro::Entity> mEnemy3{ mScene1->addEntity() };
+		std::vector<fro::Reference<fro::Entity>> mEnemies{};
 	};
 }
 

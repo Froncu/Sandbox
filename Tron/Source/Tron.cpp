@@ -55,122 +55,32 @@ namespace tron
 		ResourceManager::store<Texture>("level2", mRenderer, Surface{ "Data/Sprites/level2.png" });
 		ResourceManager::store<Texture>("level3", mRenderer, Surface{ "Data/Sprites/level3.png" });
 
+		ResourceManager::store<NavigationMesh>("level1Mesh", SVGParser::parse("Data/SVGs/level1.svg")).translate({ 0.0, 64.0 });
+		ResourceManager::store<NavigationMesh>("level2Mesh", SVGParser::parse("Data/SVGs/level2.svg")).translate({ 0.0, 64.0 });
+		ResourceManager::store<NavigationMesh>("level3Mesh", SVGParser::parse("Data/SVGs/level3.svg")).translate({ 0.0, 64.0 });
+
+		mScene1->addEntity(prefabs::level(1));
+		mScene2->addEntity(prefabs::level(2));
+		mScene3->addEntity(prefabs::level(3));
+
+		*mTank = prefabs::redTank({});
+
+		Reference<Transform> const transform{ *mTank->findComponent<Transform>() };
+		transform->setLocalTranslation({ 240, 256 });
+		*mCanon = prefabs::canon(transform);
+
+		mTank->findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
+
+		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 0, 0 }, transform)))->
+			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
+
+		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 600, 600 }, transform)))->
+			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
+
+		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 100, 400 }, transform)))->
+			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
+
 		SceneManager::setActiveScene(*mScene1);
-
-		{
-			auto worldBorder{ &mScene1->addEntity() };
-			worldBorder->attachComponent<Sprite>()->texture = ResourceManager::find<Texture>("level1");
-			worldBorder->findComponent<Sprite>()->layer = 0;
-			worldBorder->attachComponent<Transform>()->setLocalTranslation({ mRenderer.getResolution().x / 2.0, mRenderer.getResolution().y / 2.0 + 32 });
-			auto rigidbody{ worldBorder->attachComponent<Rigidbody>() };
-			rigidbody->setType(Rigidbody::Type::STATIC);
-
-			auto worldColliders{ SVGParser::parse("Data/SVGs/level1.svg") };
-			ResourceManager::store<NavigationMesh>("level1Mesh", worldColliders).translate({ 0.0, 64.0 });
-
-			for (Polygon<double>& polygon : worldColliders)
-			{
-				auto collider{ &rigidbody->addCollider() };
-				for (Vector2<double>& vertex : polygon.vertices)
-					vertex -= Vector2<double>{ 240, 224 };
-
-				collider->setShape(polygon);
-				collider->setRestitution(1.0);
-				collider->setFriction(0.0);
-			};
-
-			worldBorder = &mScene2->addEntity();
-			worldBorder->attachComponent<Sprite>()->texture = ResourceManager::find<Texture>("level2");
-			worldBorder->findComponent<Sprite>()->layer = 0;
-			worldBorder->attachComponent<Transform>()->setLocalTranslation({ mRenderer.getResolution().x / 2.0, mRenderer.getResolution().y / 2.0 + 32 });
-			rigidbody = worldBorder->attachComponent<Rigidbody>();
-			rigidbody->setType(Rigidbody::Type::STATIC);
-
-			worldColliders = SVGParser::parse("Data/SVGs/level2.svg");
-			ResourceManager::store<NavigationMesh>("level2Mesh", worldColliders).translate({ 0.0, 64.0 });
-
-			for (Polygon<double>& polygon : worldColliders)
-			{
-				auto collider{ &rigidbody->addCollider() };
-				for (Vector2<double>& vertex : polygon.vertices)
-					vertex -= Vector2<double>{ 240, 224 };
-
-				collider->setShape(polygon);
-				collider->setRestitution(1.0);
-				collider->setFriction(0.0);
-			};
-
-			worldBorder = &mScene3->addEntity();
-			worldBorder->attachComponent<Sprite>()->texture = ResourceManager::find<Texture>("level3");
-			worldBorder->findComponent<Sprite>()->layer = 0;
-			worldBorder->attachComponent<Transform>()->setLocalTranslation({ mRenderer.getResolution().x / 2.0, mRenderer.getResolution().y / 2.0 + 32 });
-			rigidbody = worldBorder->attachComponent<Rigidbody>();
-			rigidbody->setType(Rigidbody::Type::STATIC);
-
-			worldColliders = SVGParser::parse("Data/SVGs/level3.svg");
-			ResourceManager::store<NavigationMesh>("level3Mesh", worldColliders).translate({ 0.0, 64.0 });
-
-			for (Polygon<double>& polygon : worldColliders)
-			{
-				auto collider{ &rigidbody->addCollider() };
-				for (Vector2<double>& vertex : polygon.vertices)
-					vertex -= Vector2<double>{ 240, 224 };
-
-				collider->setShape(polygon);
-				collider->setRestitution(1.0);
-				collider->setFriction(0.0);
-			};
-		}
-
-		mTank->attachComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-		mTank->attachComponent<Transform>()->setLocalTranslation({ mRenderer.getResolution().x / 2.0, mRenderer.getResolution().y / 2.0 });
-		mTank->attachComponent<Sprite>()->texture = ResourceManager::find<Texture>("redTank");
-		mTank->findComponent<Sprite>()->layer = 1;
-		auto rigidbody{ mTank->attachComponent<Rigidbody>() };
-		rigidbody->setType(Rigidbody::Type::DYNAMIC);
-		auto collider{ &rigidbody->addCollider() };
-		collider->setShape(Circle<double>{ { -3.0, 0.0 }, 16.0 });
-		collider->setDensity(1.0);
-		collider->setSensor(true);
-
-		mCanon->attachComponent<Transform>()->setParent(mTank->findComponent<Transform>(), false);
-		mCanon->findComponent<Transform>()->setLocalTranslation({ -3.0, 0.0 });
-		mCanon->attachComponent<Sprite>()->texture = ResourceManager::find<Texture>("canon");
-		mCanon->findComponent<Sprite>()->layer = 3;
-		mCanon->attachComponent<PlayerCanonShooter>();
-
-		mEnemy1->attachComponent<EnemyMoveAI>()-> target = mTank->findComponent<fro::Transform>();
-		mEnemy1->attachComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-		mEnemy1->attachComponent<Transform>();
-		mEnemy1->attachComponent<Sprite>()->texture = ResourceManager::find<Texture>("blueTank");
-		mEnemy1->findComponent<Sprite>()->layer = 1;
-		rigidbody = mEnemy1->attachComponent<Rigidbody>();
-		rigidbody->setType(Rigidbody::Type::KINEMATIC);
-		collider = &rigidbody->addCollider();
-		collider->setShape(Rectangle<double>{.width{ 32.0 }, .height{ 32.0 } });
-		collider->setDensity(1.0);
-
-		mEnemy2->attachComponent<EnemyMoveAI>()->target = mTank->findComponent<fro::Transform>();
-		mEnemy2->attachComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-		mEnemy2->attachComponent<Transform>()->setLocalTranslation({ 600, 600 });
-		mEnemy2->attachComponent<Sprite>()->texture = ResourceManager::find<Texture>("blueTank");
-		mEnemy2->findComponent<Sprite>()->layer = 1;
-		rigidbody = mEnemy2->attachComponent<Rigidbody>();
-		rigidbody->setType(Rigidbody::Type::KINEMATIC);
-		collider = &rigidbody->addCollider();
-		collider->setShape(Rectangle<double>{.width{ 32.0 }, .height{ 32.0 } });
-		collider->setDensity(1.0);
-
-		mEnemy3->attachComponent<EnemyMoveAI>()->target = mTank->findComponent<fro::Transform>();
-		mEnemy3->attachComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-		mEnemy3->attachComponent<Transform>()->setLocalTranslation({ 200, 0 });
-		mEnemy3->attachComponent<Sprite>()->texture = ResourceManager::find<Texture>("blueTank");
-		mEnemy3->findComponent<Sprite>()->layer = 1;
-		rigidbody = mEnemy3->attachComponent<Rigidbody>();
-		rigidbody->setType(Rigidbody::Type::KINEMATIC);
-		collider = &rigidbody->addCollider();
-		collider->setShape(Rectangle<double>{.width{ 32.0 }, .height{ 32.0 } });
-		collider->setDensity(1.0);
 
 		Logger::info("created Tron!");
 	}
@@ -251,6 +161,7 @@ namespace tron
 
 			fro::SpriteAnimatorSystem::onUpdate(deltaSeconds);
 			PlayerCanonShooterSystem::onUpdate(deltaSeconds);
+
 			EnemyMoveAISystem::onUpdate(deltaSeconds);
 
 			mRenderer.clear();

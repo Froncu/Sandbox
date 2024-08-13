@@ -8,7 +8,7 @@ namespace tron
 	struct EnemyMoveAI final : public fro::Component
 	{
 	public:
-		fro::Reference<fro::Transform> target{};
+		fro::Reference<fro::Transform const> target{};
 		fro::Vector2<double> targetPosition{};
 		double elapsedSeconds{};
 		double maxElapsedSeconds{ 10.0 };
