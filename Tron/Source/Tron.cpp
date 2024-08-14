@@ -1,3 +1,4 @@
+#include "Prefabs/Prefabs.hpp"
 #include "Systems/AIMoveControllerSystem.hpp"
 #include "Systems/AIShootControllerSystem.hpp"
 #include "Systems/NavigatorSystem.hpp"
@@ -14,6 +15,22 @@ namespace fro
 {
 	std::unique_ptr<fro::Application> createApplication()
 	{
+		InputManager::bindActionToInput("moveRight1", Key::D);
+		InputManager::bindActionToInput("moveLeft1", Key::A);
+		InputManager::bindActionToInput("moveUp1", Key::W);
+		InputManager::bindActionToInput("moveDown1", Key::S);
+		InputManager::bindActionToInput("lookRight1", Key::RIGHT);
+		InputManager::bindActionToInput("lookLeft1", Key::LEFT);
+		InputManager::bindActionToInput("lookUp1", Key::UP);
+		InputManager::bindActionToInput("lookDown1", Key::DOWN);
+		InputManager::bindActionToInput("shoot1", Key::SPACE);
+
+		PhysicsSystem::setGravity({});
+
+		ResourceManager::store<tron::NavigationMesh>("world1Mesh", SVGParser::parse("Data/SVGs/world1.svg")).translate({ 0.0, 64.0 });
+		ResourceManager::store<tron::NavigationMesh>("world2Mesh", SVGParser::parse("Data/SVGs/world2.svg")).translate({ 0.0, 64.0 });
+		ResourceManager::store<tron::NavigationMesh>("world3Mesh", SVGParser::parse("Data/SVGs/world3.svg")).translate({ 0.0, 64.0 });
+
 		return std::make_unique<tron::Tron>();
 	}
 }
@@ -36,31 +53,17 @@ namespace tron
 	{
 		using namespace fro;
 
-		InputManager::bindActionToInput("moveRight1", Key::D);
-		InputManager::bindActionToInput("moveLeft1", Key::A);
-		InputManager::bindActionToInput("moveUp1", Key::W);
-		InputManager::bindActionToInput("moveDown1", Key::S);
-		InputManager::bindActionToInput("lookRight1", Key::RIGHT);
-		InputManager::bindActionToInput("lookLeft1", Key::LEFT);
-		InputManager::bindActionToInput("lookUp1", Key::UP);
-		InputManager::bindActionToInput("lookDown1", Key::DOWN);
-		InputManager::bindActionToInput("shoot1", Key::SPACE);
-
-		PhysicsSystem::setGravity({});
-
 		ResourceManager::store<Texture>("redTank", mRenderer, Surface{ "Data/Sprites/redTank.png" });
+		ResourceManager::store<Texture>("greenTank", mRenderer, Surface{ "Data/Sprites/greenTank.png" });
+		ResourceManager::store<Texture>("redCanon", mRenderer, Surface{ "Data/Sprites/redCanon.png" });
+		ResourceManager::store<Texture>("greenCanon", mRenderer, Surface{ "Data/Sprites/greenCanon.png" });
 		ResourceManager::store<Texture>("blueTank", mRenderer, Surface{ "Data/Sprites/blueTank.png" });
 		ResourceManager::store<Texture>("recognizer", mRenderer, Surface{ "Data/Sprites/recognizer.png" });
-		ResourceManager::store<Texture>("canon", mRenderer, Surface{ "Data/Sprites/canon.png" });
 		ResourceManager::store<Texture>("playerBullet", mRenderer, Surface{ "Data/Sprites/playerBullet.png" });
 		ResourceManager::store<Texture>("enemyBullet", mRenderer, Surface{ "Data/Sprites/enemyBullet.png" });
 		ResourceManager::store<Texture>("world1", mRenderer, Surface{ "Data/Sprites/world1.png" });
 		ResourceManager::store<Texture>("world2", mRenderer, Surface{ "Data/Sprites/world2.png" });
 		ResourceManager::store<Texture>("world3", mRenderer, Surface{ "Data/Sprites/world3.png" });
-
-		ResourceManager::store<NavigationMesh>("world1Mesh", SVGParser::parse("Data/SVGs/world1.svg")).translate({ 0.0, 64.0 });
-		ResourceManager::store<NavigationMesh>("world2Mesh", SVGParser::parse("Data/SVGs/world2.svg")).translate({ 0.0, 64.0 });
-		ResourceManager::store<NavigationMesh>("world3Mesh", SVGParser::parse("Data/SVGs/world3.svg")).translate({ 0.0, 64.0 });
 
 		Logger::info("created Tron!");
 	}
@@ -90,8 +93,8 @@ namespace tron
 				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
 				if (getActiveScene.valid())
 					fro::SceneManager::removeScene(*getActiveScene);
-
-				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(1)));
+			
+				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(1, Mode::SINGLE)));
 			}
 			
 			if (fro::InputManager::isInputJustPressed(fro::Key::NUMBER_2))
@@ -99,8 +102,8 @@ namespace tron
 				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
 				if (getActiveScene.valid())
 					fro::SceneManager::removeScene(*getActiveScene);
-
-				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(2)));
+			
+				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(2, Mode::COOP)));
 			}
 			
 			if (fro::InputManager::isInputJustPressed(fro::Key::NUMBER_3))
@@ -108,8 +111,8 @@ namespace tron
 				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
 				if (getActiveScene.valid())
 					fro::SceneManager::removeScene(*getActiveScene);
-
-				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(3)));
+			
+				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(3, Mode::VERSUS)));
 			}
 
 			fixedUpdateAccumulator += deltaSeconds;

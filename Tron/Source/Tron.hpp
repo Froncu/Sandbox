@@ -3,13 +3,28 @@
 
 #include "Fronge.hpp"
 
-#include "Prefabs/Prefabs.hpp"
-
 namespace tron
 {
 	class Tron final : public fro::Application
 	{
 	public:
+		enum class Mode
+		{
+			SINGLE,
+			COOP,
+			VERSUS
+		};
+
+		enum class State
+		{
+			MENU,
+			LOADING,
+			PLAYING,
+			LOST,
+			WON,
+			END
+		};
+
 		Tron();
 		Tron(Tron const&) = default;
 		Tron(Tron&&) noexcept = default;
@@ -25,7 +40,8 @@ namespace tron
 		fro::Window mMainWindow{ "Tron", { 1280, 720 } };
 		fro::Renderer mRenderer{ mMainWindow, { 480, 512 } };
 
-		std::unique_ptr<fro::Gamepad> mGamePad{};
+		std::unique_ptr<fro::Gamepad> mGamepad1{};
+		std::unique_ptr<fro::Gamepad> mGamepad2{};
 
 		bool mIsRunning{ true };
 
@@ -46,34 +62,39 @@ namespace tron
 				{
 					using namespace fro;
 
-					if (mGamePad.get())
+					auto& gamepadToSet{ mGamepad1.get() ? mGamepad2 : mGamepad1 };
+					if (gamepadToSet.get())
 						return false;
 
-					mGamePad = std::make_unique<Gamepad>(event.deviceID);
+					gamepadToSet = std::make_unique<Gamepad>(event.deviceID);
 
-					auto const ID{ mGamePad->getID() };
-					InputManager::bindActionToInput("moveRight2", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_RIGHT });
-					InputManager::bindActionToInput("moveLeft2", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_LEFT });
-					InputManager::bindActionToInput("moveUp2", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_UP });
-					InputManager::bindActionToInput("moveDown2", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_DOWN });
-					InputManager::bindActionToInput("lookRight2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_RIGHT });
-					InputManager::bindActionToInput("lookLeft2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_LEFT });
-					InputManager::bindActionToInput("lookUp2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_UP });
-					InputManager::bindActionToInput("lookDown2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_DOWN });
-					InputManager::bindActionToInput("shoot2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_TRIGGER });
+					auto const ID{ gamepadToSet->getID() };
+
+					std::string const number{ std::to_string(&gamepadToSet == &mGamepad1 ? 2 : 1) };
+					InputManager::bindActionToInput("moveRight" + number, GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_RIGHT });
+					InputManager::bindActionToInput("moveLeft" + number, GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_LEFT });
+					InputManager::bindActionToInput("moveUp" + number, GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_UP });
+					InputManager::bindActionToInput("moveDown" + number, GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_DOWN });
+					InputManager::bindActionToInput("lookRight" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_RIGHT });
+					InputManager::bindActionToInput("lookLeft" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_LEFT });
+					InputManager::bindActionToInput("lookUp" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_UP });
+					InputManager::bindActionToInput("lookDown" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_DOWN });
+					InputManager::bindActionToInput("shoot" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_TRIGGER });
 
 					return true;
 				},
 
 				[this](fro::GamepadDisconnectedEvent const& event)
 				{
-					if (not mGamePad.get())
+					if (mGamepad1.get() and event.ID == mGamepad1->getID())
+						mGamepad1.reset();
+
+					else if (mGamepad2.get() and event.ID == mGamepad2->getID())
+						mGamepad2.reset();
+
+					else
 						return false;
 
-					if (event.ID not_eq mGamePad->getID())
-						return false;
-
-					mGamePad.reset();
 					return true;
 				},
 

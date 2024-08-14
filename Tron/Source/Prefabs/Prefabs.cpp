@@ -47,14 +47,14 @@ namespace tron
 			return entity;
 		}
 
-		fro::Entity redTank(fro::Vector2<double> const position)
+		fro::Entity tank(fro::Vector2<double> const position, bool const red)
 		{
 			fro::Entity entity{};
 
 			entity.attachComponent<fro::Transform>()->setLocalTranslation(position);
 
 			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
-			sprite.texture = fro::ResourceManager::find<fro::Texture>("redTank");
+			sprite.texture = fro::ResourceManager::find<fro::Texture>(red ? "redTank" : "greenTank");
 			sprite.layer = 1;
 
 			fro::Rigidbody& rigidbody{ *entity.attachComponent<fro::Rigidbody>() };
@@ -69,24 +69,36 @@ namespace tron
 
 			entity.attachComponent<Navigator>();
 			entity.attachComponent<PlayerCollider>();
-			entity.attachComponent<PlayerMoveController>();
+
+			PlayerMoveController& controller{ *entity.attachComponent<PlayerMoveController>() };
+			std::string const number{ std::to_string(red ? 1 : 2) };
+			controller.moveRightAction = "moveRight" + number;
+			controller.moveLeftAction = "moveLeft" + number;
+			controller.moveUpAction = "moveUp" + number;
+			controller.moveDownAction = "moveDown" + number;
 
 			return entity;
 		}
 
-		fro::Entity canon(fro::Reference<fro::Transform> const redTankTransform)
+		fro::Entity canon(fro::Reference<fro::Transform> const tankTransform, bool const red)
 		{
 			fro::Entity entity{};
 
 			fro::Transform& transform{ *entity.attachComponent<fro::Transform>() };
-			transform.setParent(&*redTankTransform, false);
+			transform.setParent(&*tankTransform, false);
 			transform.setLocalTranslation({ -3.0, 0.0 });
 
 			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
-			sprite.texture = fro::ResourceManager::find<fro::Texture>("canon");
+			sprite.texture = fro::ResourceManager::find<fro::Texture>(red ? "redCanon" : "greenCanon");
 			sprite.layer = 3;
 
-			entity.attachComponent<PlayerCanonController>();
+			PlayerCanonController& controller{ *entity.attachComponent<PlayerCanonController>() };
+			std::string const number{ std::to_string(red ? 1 : 2) };
+			controller.lookRightAction = "lookRight" + number;
+			controller.lookLeftAction = "lookLeft" + number;
+			controller.lookUpAction = "lookUp" + number;
+			controller.lookDownAction = "lookDown" + number;
+			controller.shootAction = "shoot" + number;
 
 			return entity;
 		}
@@ -222,7 +234,7 @@ namespace tron
 			rigidbody.setType(fro::Rigidbody::Type::KINEMATIC);
 
 			fro::Collider& collider{ rigidbody.addCollider() };
-			collider.setShape(fro::Rectangle<double>{ .x{ -3.0 }, .width{ 26.0 }, .height{ 32.0 } });
+			collider.setShape(fro::Rectangle<double>{.x{ -3.0 }, .width{ 26.0 }, .height{ 32.0 } });
 			collider.setDensity(1.0);
 			collider.setCategoryBits(fro::createBitfield(4ull));
 			collider.setMaskBits(fro::createBitfield(1ull, 3ull));
@@ -237,7 +249,7 @@ namespace tron
 			return entity;
 		}
 
-		fro::Scene level(std::size_t const which)
+		fro::Scene level(std::size_t const which, Tron::Mode const mode)
 		{
 			fro::Scene scene{};
 
@@ -246,17 +258,27 @@ namespace tron
 			NavigationMesh const& navigationMesh{ *fro::ResourceManager::find<NavigationMesh>("world" + std::to_string(which) + "Mesh") };
 			auto const& nodes{ navigationMesh.getNodes() };
 			std::size_t const redTankNodeIndex{ std::rand() % nodes.size() };
-			fro::Reference<fro::Entity const> const redTankEntity{ scene.addEntity(redTank(nodes[redTankNodeIndex].first)) };
 
-			Navigator* navigator{ redTankEntity->findComponent<Navigator>() };
-			navigator->setNavigationMesh(navigationMesh);
+			fro::Reference<fro::Entity const> const redTankEntity{ scene.addEntity(tank(nodes[redTankNodeIndex].first)) };
+			redTankEntity->findComponent<Navigator>()->setNavigationMesh(navigationMesh);
 
 			scene.addEntity(canon(redTankEntity->findComponent<fro::Transform>()));
 
+			if (mode == Tron::Mode::COOP)
+			{
+				std::size_t const greenTankNodeIndex{ nodes[redTankNodeIndex].second.front() };
+				fro::Reference<fro::Entity const> const greenTankEntity{ scene.addEntity(tank(nodes[greenTankNodeIndex].first, false)) };
+				greenTankEntity->findComponent<Navigator>()->setNavigationMesh(navigationMesh);
+
+				scene.addEntity(canon(greenTankEntity->findComponent<fro::Transform>(), false));
+			}
+
 			fro::Reference<fro::Transform const> redTankTransform{ redTankEntity->findComponent<fro::Transform>() };
 
+			Navigator* navigator{};
 			std::unordered_set<std::size_t> takenIndices{};
-			for (std::size_t i{}; i < 4 - which; ++i)
+			std::size_t const amountOfBlueTanks{ 4 - which };
+			for (std::size_t i{}; i < amountOfBlueTanks; ++i)
 			{
 				std::size_t nodeIndex;
 				do
@@ -266,7 +288,12 @@ namespace tron
 					(nodes[nodeIndex].first - nodes[redTankNodeIndex].first).getMagnitude() < 256.0);
 
 				takenIndices.insert(nodeIndex);
-				navigator = scene.addEntity(prefabs::blueTankAI(nodes[nodeIndex].first, redTankTransform)).findComponent<Navigator>();
+
+				if (mode == Tron::Mode::VERSUS and i == amountOfBlueTanks - 1)
+					navigator = scene.addEntity(prefabs::blueTankPlayer(nodes[nodeIndex].first)).findComponent<Navigator>();
+				else
+					navigator = scene.addEntity(prefabs::blueTankAI(nodes[nodeIndex].first, redTankTransform)).findComponent<Navigator>();
+
 				navigator->setNavigationMesh(navigationMesh);
 			}
 
