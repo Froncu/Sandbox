@@ -15,7 +15,7 @@ namespace tron
 		static void onUpdate(double const deltaSeconds);
 
 	private:
-		static fro::Group<Navigator, PlayerMoveController> sGroup;
+		static fro::Group<fro::Transform, Navigator, PlayerMoveController> sGroup;
 
 		PlayerMoveControllerSystem() = delete;
 		PlayerMoveControllerSystem(PlayerMoveControllerSystem const&) = delete;

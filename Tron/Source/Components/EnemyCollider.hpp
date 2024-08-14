@@ -77,7 +77,7 @@ namespace tron
 		{
 			[smartThis = fro::Reference{ this }](fro::Collider const&, fro::Rigidbody const&, fro::Collider const& collider)
 			{
-				if (not (collider.getCategoryBits() & fro::createBitfield(1ull)))
+				if (not (collider.getCategoryBits() & fro::createBitfield(1)))
 					return false;
 
 				--smartThis->mHealth;

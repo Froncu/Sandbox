@@ -25,11 +25,12 @@ namespace tron
 			if (not collider.valid())
 				continue;
 
-			if (not (collider->getCategoryBits() & fro::createBitfield(3ull)))
+			if (not (collider->getCategoryBits() & fro::createBitfield(3)))
 				continue;
 
 			entity->getParentingScene()->addEntity(prefabs::blueTankBullet(transform));
 			elapsedSeconds -= shootCooldown;
+			fro::Audio::playSoundEffect("Data/Sound/shoot.wav");
 		}
 	}
 

@@ -29,6 +29,8 @@ namespace tron
 		FRO_NODISCARD std::size_t getClosestNodeIndex() const;
 		FRO_NODISCARD bool isOnNode() const;
 
+		FRO_NODISCARD void reset();
+
 		fro::Vector2<double> mDesiredDirection{};
 		double mVelocity{ 64.0 };
 

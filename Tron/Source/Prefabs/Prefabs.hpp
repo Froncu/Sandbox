@@ -24,7 +24,9 @@ namespace tron
 
 		FRO_NODISCARD fro::Entity recognizer(fro::Vector2<double> const position, fro::Reference<fro::Transform const> const redTankTransform);
 
-		FRO_NODISCARD fro::Scene level(std::size_t const which, Tron::Mode const mode);
+		FRO_NODISCARD fro::Scene level(std::size_t const which, Tron::Mode const mode,
+			fro::Reference<fro::Entity>& player1, fro::Reference<fro::Entity>& player2,
+			std::vector<fro::Reference<fro::Entity>>& blueTanks, std::vector<fro::Reference<fro::Entity>>& recognizers);
 	}
 }
 

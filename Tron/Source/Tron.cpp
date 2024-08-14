@@ -53,6 +53,7 @@ namespace tron
 	{
 		using namespace fro;
 
+		ResourceManager::store<Texture>("menu", mRenderer, Surface{ "Data/Sprites/menu.png" });
 		ResourceManager::store<Texture>("redTank", mRenderer, Surface{ "Data/Sprites/redTank.png" });
 		ResourceManager::store<Texture>("greenTank", mRenderer, Surface{ "Data/Sprites/greenTank.png" });
 		ResourceManager::store<Texture>("redCanon", mRenderer, Surface{ "Data/Sprites/redCanon.png" });
@@ -64,6 +65,8 @@ namespace tron
 		ResourceManager::store<Texture>("world1", mRenderer, Surface{ "Data/Sprites/world1.png" });
 		ResourceManager::store<Texture>("world2", mRenderer, Surface{ "Data/Sprites/world2.png" });
 		ResourceManager::store<Texture>("world3", mRenderer, Surface{ "Data/Sprites/world3.png" });
+
+		menu();
 
 		Logger::info("created Tron!");
 	}
@@ -84,35 +87,108 @@ namespace tron
 			auto const t2{ std::chrono::steady_clock::now() };
 			double const deltaSeconds{ std::chrono::duration<double>(t2 - t1).count() };
 			t1 = t2;
-
+			
 			fro::InputManager::processInputContinous();
 			fro::SystemEventManager::pollEvents();
 
-			if (fro::InputManager::isInputJustPressed(fro::Key::NUMBER_1))
+			static double elapsedSeconds{};
+			switch (mState)
 			{
-				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
-				if (getActiveScene.valid())
-					fro::SceneManager::removeScene(*getActiveScene);
-			
-				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(1, Mode::SINGLE)));
+			case tron::Tron::State::PLAYING:
+			{
+				if (not mPlayer1.valid() and not mPlayer1Flagged)
+				{
+					fro::Logger::info(--mPlayer1HP);
+					mPlayer1Flagged = true;
+				}
+
+				if (not mPlayer2.valid() and not mPlayer2Flagged)
+				{
+					fro::Logger::info(--mPlayer2HP);
+					mPlayer2Flagged = true;
+				}
+
+				auto const newEndTanks
+				{
+					std::remove_if(mBlueTanks.begin(), mBlueTanks.end(),
+						[](fro::Reference<fro::Entity> const& blueTank)
+						{
+							return not blueTank.valid();
+						})
+				};
+
+				mScore += 100 * std::distance(newEndTanks, mBlueTanks.end());
+				mBlueTanks.erase(newEndTanks, mBlueTanks.end());
+
+				auto const newEndRecognizers
+				{
+					std::remove_if(mRecognizers.begin(), mRecognizers.end(),
+						[](fro::Reference<fro::Entity> const& recognizer)
+						{
+							return not recognizer.valid();
+						})
+				};
+
+				mScore += 250 * std::distance(newEndRecognizers, mRecognizers.end());
+				mRecognizers.erase(newEndRecognizers, mRecognizers.end());
+
+				if (not mPlayer1.valid() and not mPlayer2.valid())
+				{
+					fro::Audio::playSoundEffect("Data/Sound/loss.wav");
+					mState = State::LOST;
+					mPlayer1Flagged = false;
+					mPlayer2Flagged = false;
+					fro::Audio::stopMusic();
+				}
+				else if (mBlueTanks.empty() and mRecognizers.empty())
+				{
+					fro::Audio::playSoundEffect("Data/Sound/win.wav");
+					mState = State::WON;
+					mPlayer1Flagged = false;
+					mPlayer2Flagged = false;
+					fro::Audio::stopMusic();
+				}
+				break;
 			}
-			
-			if (fro::InputManager::isInputJustPressed(fro::Key::NUMBER_2))
-			{
-				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
-				if (getActiveScene.valid())
-					fro::SceneManager::removeScene(*getActiveScene);
-			
-				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(2, Mode::COOP)));
-			}
-			
-			if (fro::InputManager::isInputJustPressed(fro::Key::NUMBER_3))
-			{
-				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
-				if (getActiveScene.valid())
-					fro::SceneManager::removeScene(*getActiveScene);
-			
-				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(3, Mode::VERSUS)));
+
+			case tron::Tron::State::LOST:
+				elapsedSeconds += deltaSeconds;
+				if (elapsedSeconds >= 4.0)
+				{
+					elapsedSeconds = 0;
+					if ((mMode == Mode::COOP and (mPlayer1HP or mPlayer2HP)) or
+						mPlayer1HP)
+					{
+						mState = State::PLAYING;
+						nextLevel();
+						fro::Audio::playMusic("Data/Sound/music.wav");
+					}
+					else
+					{
+						mState = State::MENU;
+						mPlayer1HP = 4;
+						mPlayer2HP = 4;
+						mPlayer1Flagged = false;
+						mPlayer2Flagged = false;
+						menu();
+					}
+				}
+				else
+					continue;
+				break;
+
+			case tron::Tron::State::WON:
+				elapsedSeconds += deltaSeconds;
+				if (elapsedSeconds >= 4.0)
+				{
+					elapsedSeconds = 0;
+					mState = State::PLAYING;
+					fro::Audio::playMusic("Data/Sound/music.wav");
+					nextLevel();
+				}
+				else
+					continue;
+				break;
 			}
 
 			fixedUpdateAccumulator += deltaSeconds;
@@ -136,5 +212,31 @@ namespace tron
 
 			fro::SceneManager::doomAndAdd();
 		}
+	}
+
+	void Tron::menu()
+	{
+		fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
+		if (getActiveScene.valid())
+			fro::SceneManager::removeScene(*getActiveScene);
+
+		fro::Scene& scene{ fro::SceneManager::addScene() };
+		fro::Entity& entity{ scene.addEntity() };
+		entity.attachComponent<fro::Transform>()->setLocalTranslation({ 240, 256 });
+		entity.attachComponent<fro::Sprite>()->texture = fro::ResourceManager::find<fro::Texture>("menu");
+		
+		fro::SceneManager::setActiveScene(scene);
+	}
+
+	void Tron::nextLevel()
+	{
+		fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
+		if (getActiveScene.valid())
+			fro::SceneManager::removeScene(*getActiveScene);
+
+		mCurrentLevel = (mCurrentLevel + 1) % 3;
+
+		fro::SceneManager::setActiveScene(fro::SceneManager::addScene(
+			prefabs::level(mCurrentLevel + 1, mMode, mPlayer1, mPlayer2, mBlueTanks, mRecognizers)));
 	}
 }

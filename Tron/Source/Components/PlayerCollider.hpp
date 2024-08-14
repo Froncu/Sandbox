@@ -77,8 +77,8 @@ namespace tron
 		{
 			[smartThis = fro::Reference{ this }](fro::Collider const&, fro::Rigidbody const&, fro::Collider const& collider)
 			{
-				if (not (collider.getCategoryBits() & fro::createBitfield(4ull)) and
-					not (collider.getCategoryBits() & fro::createBitfield(5ull)))
+				if (not (collider.getCategoryBits() & fro::createBitfield(4)) and
+					not (collider.getCategoryBits() & fro::createBitfield(5)))
 					return false;
 
 				smartThis->mParentingEntity->markDoomed();

@@ -26,4 +26,9 @@ namespace tron
 
 		return mNodeIndex1 == mNodeIndex2;
 	}
+
+	void Navigator::reset()
+	{
+		mNodeIndex1 = mNodeIndex2 = INVALID_NODE_INDEX;
+	}
 }
