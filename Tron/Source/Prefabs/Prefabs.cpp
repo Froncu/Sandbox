@@ -55,7 +55,7 @@ namespace tron
 
 			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
 			sprite.texture = fro::ResourceManager::find<fro::Texture>(red ? "redTank" : "greenTank");
-			sprite.layer = 1;
+			sprite.layer = red ? 2 : 4;
 
 			fro::Rigidbody& rigidbody{ *entity.attachComponent<fro::Rigidbody>() };
 			rigidbody.setType(fro::Rigidbody::Type::DYNAMIC);
@@ -90,8 +90,8 @@ namespace tron
 
 			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
 			sprite.texture = fro::ResourceManager::find<fro::Texture>(red ? "redCanon" : "greenCanon");
-			sprite.layer = 3;
-
+			sprite.layer = red ? 3 : 5;
+ 
 			PlayerCanonController& controller{ *entity.attachComponent<PlayerCanonController>() };
 			std::string const number{ std::to_string(red ? 1 : 2) };
 			controller.lookRightAction = "lookRight" + number;
@@ -103,7 +103,7 @@ namespace tron
 			return entity;
 		}
 
-		fro::Entity redTankBullet(fro::Reference<fro::Transform const> const canonTransform)
+		fro::Entity bullet(fro::Reference<fro::Transform const> const canonTransform)
 		{
 			fro::Entity entity{};
 
@@ -115,7 +115,7 @@ namespace tron
 
 			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
 			sprite.texture = fro::ResourceManager::find<fro::Texture>("playerBullet");
-			sprite.layer = 2;
+			sprite.layer = 1;
 
 			fro::Rigidbody& rigidbody{ *entity.attachComponent<fro::Rigidbody>() };
 			rigidbody.setType(fro::Rigidbody::Type::DYNAMIC);
@@ -142,7 +142,7 @@ namespace tron
 
 			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
 			sprite.texture = fro::ResourceManager::find<fro::Texture>("blueTank");
-			sprite.layer = 1;
+			sprite.layer = 6;
 
 			fro::Rigidbody& rigidbody{ *entity.attachComponent<fro::Rigidbody>() };
 			rigidbody.setType(fro::Rigidbody::Type::KINEMATIC);
@@ -201,7 +201,7 @@ namespace tron
 
 			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
 			sprite.texture = fro::ResourceManager::find<fro::Texture>("enemyBullet");
-			sprite.layer = 2;
+			sprite.layer = 1;
 
 			fro::Rigidbody& rigidbody{ *entity.attachComponent<fro::Rigidbody>() };
 			rigidbody.setType(fro::Rigidbody::Type::DYNAMIC);
@@ -228,7 +228,7 @@ namespace tron
 
 			fro::Sprite& sprite{ *entity.attachComponent<fro::Sprite>() };
 			sprite.texture = fro::ResourceManager::find<fro::Texture>("recognizer");
-			sprite.layer = 1;
+			sprite.layer = 6;
 
 			fro::Rigidbody& rigidbody{ *entity.attachComponent<fro::Rigidbody>() };
 			rigidbody.setType(fro::Rigidbody::Type::KINEMATIC);

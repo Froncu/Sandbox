@@ -36,7 +36,7 @@ namespace tron
 				controller->consecutiveShotsCount = 1;
 
 			controller->elapsedSecondsSinceLastShot = 0.0;
-			entity->getParentingScene()->addEntity(prefabs::redTankBullet(transform));
+			entity->getParentingScene()->addEntity(prefabs::bullet(transform));
 		}
 	}
 

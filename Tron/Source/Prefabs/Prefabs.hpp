@@ -15,7 +15,7 @@ namespace tron
 
 		FRO_NODISCARD fro::Entity tank(fro::Vector2<double> const position, bool const red = true);
 		FRO_NODISCARD fro::Entity canon(fro::Reference<fro::Transform> const tankTransform, bool const red = true);
-		FRO_NODISCARD fro::Entity redTankBullet(fro::Reference<fro::Transform const> const canonTransform);
+		FRO_NODISCARD fro::Entity bullet(fro::Reference<fro::Transform const> const canonTransform);
 
 		FRO_NODISCARD fro::Entity blueTank(fro::Vector2<double> const position);
 		FRO_NODISCARD fro::Entity blueTankAI(fro::Vector2<double> const position, fro::Reference<fro::Transform const> const redTankTransform);
