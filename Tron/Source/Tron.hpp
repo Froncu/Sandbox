@@ -18,11 +18,10 @@ namespace tron
 		enum class State
 		{
 			MENU,
-			LOADING,
 			PLAYING,
 			LOST,
 			WON,
-			END
+			SCORE
 		};
 
 		Tron();
@@ -37,6 +36,9 @@ namespace tron
 		virtual void run() override;
 
 	private:
+		void menu();
+		void nextLevel();
+
 		fro::Window mMainWindow{ "Tron", { 1280, 720 } };
 		fro::Renderer mRenderer{ mMainWindow, { 480, 512 } };
 
@@ -60,26 +62,24 @@ namespace tron
 			{
 				[this](fro::GamepadConnectedEvent const& event)
 				{
-					using namespace fro;
-
 					auto& gamepadToSet{ mGamepad1.get() ? mGamepad2 : mGamepad1 };
 					if (gamepadToSet.get())
 						return false;
 
-					gamepadToSet = std::make_unique<Gamepad>(event.deviceID);
+					gamepadToSet = std::make_unique<fro::Gamepad>(event.deviceID);
 
 					auto const ID{ gamepadToSet->getID() };
 
 					std::string const number{ std::to_string(&gamepadToSet == &mGamepad1 ? 2 : 1) };
-					InputManager::bindActionToInput("moveRight" + number, GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_RIGHT });
-					InputManager::bindActionToInput("moveLeft" + number, GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_LEFT });
-					InputManager::bindActionToInput("moveUp" + number, GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_UP });
-					InputManager::bindActionToInput("moveDown" + number, GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_DOWN });
-					InputManager::bindActionToInput("lookRight" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_RIGHT });
-					InputManager::bindActionToInput("lookLeft" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_LEFT });
-					InputManager::bindActionToInput("lookUp" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_UP });
-					InputManager::bindActionToInput("lookDown" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_DOWN });
-					InputManager::bindActionToInput("shoot" + number, GamepadAxisInput{ ID, GamepadAxis::RIGHT_TRIGGER });
+					fro::InputManager::bindActionToInput("moveRight" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::LEFT_STICK_RIGHT });
+					fro::InputManager::bindActionToInput("moveLeft" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::LEFT_STICK_LEFT });
+					fro::InputManager::bindActionToInput("moveUp" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::LEFT_STICK_UP });
+					fro::InputManager::bindActionToInput("moveDown" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::LEFT_STICK_DOWN });
+					fro::InputManager::bindActionToInput("lookRight" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::RIGHT_STICK_RIGHT });
+					fro::InputManager::bindActionToInput("lookLeft" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::RIGHT_STICK_LEFT });
+					fro::InputManager::bindActionToInput("lookUp" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::RIGHT_STICK_UP });
+					fro::InputManager::bindActionToInput("lookDown" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::RIGHT_STICK_DOWN });
+					fro::InputManager::bindActionToInput("shoot" + number, fro::GamepadAxisInput{ ID, fro::GamepadAxis::RIGHT_TRIGGER });
 
 					return true;
 				},
@@ -98,6 +98,46 @@ namespace tron
 					return true;
 				},
 
+				[this](fro::KeyDownEvent const& event)
+				{
+					if (event.key == fro::Key::M)
+						fro::Audio::setMute(!fro::Audio::isMuted());
+
+					else if (mState == State::MENU)
+					{
+						switch (event.key)
+						{
+						case fro::Key::S:
+							mMode = Mode::SINGLE;
+							mState = State::PLAYING;
+							nextLevel();
+							fro::Audio::playMusic("Data/Sound/music.wav");
+							break;
+
+						case fro::Key::C:
+							mMode = Mode::COOP;
+							mState = State::PLAYING;
+							nextLevel();
+							fro::Audio::playMusic("Data/Sound/music.wav");
+							break;
+
+						case fro::Key::V:
+							mMode = Mode::VERSUS;
+							mState = State::PLAYING;
+							nextLevel();
+							fro::Audio::playMusic("Data/Sound/music.wav");
+							break;
+						}
+					}
+					else if (event.key == fro::Key::F1)
+					{
+						nextLevel();
+						return true;
+					}
+					
+					return true;
+				},
+
 				[](auto&&)
 				{
 					return false;
@@ -105,9 +145,24 @@ namespace tron
 			}, fro::SystemEventManager::mInputEvent
 		};
 
+		std::size_t mCurrentLevel{ 2 };
+
+		Mode mMode{};
+		State mState{ State::MENU };
+
+		std::vector<fro::Reference<fro::Entity>> mBlueTanks{};
+		std::vector<fro::Reference<fro::Entity>> mRecognizers{};
+
+		std::size_t mScore{};
+
 		fro::Reference<fro::Entity> mPlayer1{};
 		fro::Reference<fro::Entity> mPlayer2{};
-		std::vector<fro::Reference<fro::Entity>> mEnemies{};
+
+		int mPlayer1HP{ 4 };
+		int mPlayer2HP{ 4 };
+
+		bool mPlayer1Flagged{};
+		bool mPlayer2Flagged{};
 	};
 }
 

@@ -30,6 +30,7 @@ namespace tron
 
 			entity->getParentingScene()->addEntity(prefabs::blueTankBullet(transform));
 			elapsedSeconds -= shootCooldown;
+			fro::Audio::playSoundEffect("Data/Sound/shoot.wav");
 		}
 	}
 

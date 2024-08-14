@@ -37,6 +37,7 @@ namespace tron
 
 			controller->elapsedSecondsSinceLastShot = 0.0;
 			entity->getParentingScene()->addEntity(prefabs::bullet(transform));
+			fro::Audio::playSoundEffect("Data/Sound/canon.wav");
 		}
 	}
 

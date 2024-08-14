@@ -249,8 +249,13 @@ namespace tron
 			return entity;
 		}
 
-		fro::Scene level(std::size_t const which, Tron::Mode const mode)
+		fro::Scene level(std::size_t const which, Tron::Mode const mode,
+			fro::Reference<fro::Entity>& player1, fro::Reference<fro::Entity>& player2,
+			std::vector<fro::Reference<fro::Entity>>& blueTanks, std::vector<fro::Reference<fro::Entity>>& recognizers)
 		{
+			blueTanks.clear();
+			recognizers.clear();
+
 			fro::Scene scene{};
 
 			fro::Reference<fro::Entity const> const worldEntity{ scene.addEntity(world(which)) };
@@ -259,23 +264,25 @@ namespace tron
 			auto const& nodes{ navigationMesh.getNodes() };
 			std::size_t const redTankNodeIndex{ std::rand() % nodes.size() };
 
-			fro::Reference<fro::Entity const> const redTankEntity{ scene.addEntity(tank(nodes[redTankNodeIndex].first)) };
-			redTankEntity->findComponent<Navigator>()->setNavigationMesh(navigationMesh);
+			player1 = scene.addEntity(tank(nodes[redTankNodeIndex].first));
+			player1->findComponent<Navigator>()->setNavigationMesh(navigationMesh);
 
-			scene.addEntity(canon(redTankEntity->findComponent<fro::Transform>()));
+			scene.addEntity(canon(player1->findComponent<fro::Transform>()));
 
 			if (mode == Tron::Mode::COOP)
 			{
 				std::size_t const greenTankNodeIndex{ nodes[redTankNodeIndex].second.front() };
-				fro::Reference<fro::Entity const> const greenTankEntity{ scene.addEntity(tank(nodes[greenTankNodeIndex].first, false)) };
-				greenTankEntity->findComponent<Navigator>()->setNavigationMesh(navigationMesh);
+				player2 = scene.addEntity(tank(nodes[greenTankNodeIndex].first, false));
+				player2->findComponent<Navigator>()->setNavigationMesh(navigationMesh);
 
-				scene.addEntity(canon(greenTankEntity->findComponent<fro::Transform>(), false));
+				scene.addEntity(canon(player2->findComponent<fro::Transform>(), false));
 			}
+			else
+				player2.reset();
 
-			fro::Reference<fro::Transform const> redTankTransform{ redTankEntity->findComponent<fro::Transform>() };
+			fro::Reference<fro::Transform const> player1Transform{ player1->findComponent<fro::Transform>() };
 
-			Navigator* navigator{};
+			fro::Entity* enemyEntity{};
 			std::unordered_set<std::size_t> takenIndices{};
 			std::size_t const amountOfBlueTanks{ 4 - which };
 			for (std::size_t i{}; i < amountOfBlueTanks; ++i)
@@ -290,11 +297,12 @@ namespace tron
 				takenIndices.insert(nodeIndex);
 
 				if (mode == Tron::Mode::VERSUS and i == amountOfBlueTanks - 1)
-					navigator = scene.addEntity(prefabs::blueTankPlayer(nodes[nodeIndex].first)).findComponent<Navigator>();
+					enemyEntity = &scene.addEntity(prefabs::blueTankPlayer(nodes[nodeIndex].first));
 				else
-					navigator = scene.addEntity(prefabs::blueTankAI(nodes[nodeIndex].first, redTankTransform)).findComponent<Navigator>();
+					enemyEntity = &scene.addEntity(prefabs::blueTankAI(nodes[nodeIndex].first, player1Transform));
 
-				navigator->setNavigationMesh(navigationMesh);
+				enemyEntity->findComponent<Navigator>()->setNavigationMesh(navigationMesh);
+				blueTanks.push_back(enemyEntity);
 			}
 
 			for (std::size_t i{}; i < which; ++i)
@@ -307,8 +315,10 @@ namespace tron
 					(nodes[nodeIndex].first - nodes[redTankNodeIndex].first).getMagnitude() < 256.0);
 
 				takenIndices.insert(nodeIndex);
-				navigator = scene.addEntity(prefabs::recognizer(nodes[nodeIndex].first, redTankTransform)).findComponent<Navigator>();
-				navigator->setNavigationMesh(navigationMesh);
+				enemyEntity = &scene.addEntity(prefabs::recognizer(nodes[nodeIndex].first, player1Transform));
+				enemyEntity->findComponent<Navigator>()->setNavigationMesh(navigationMesh);
+
+				recognizers.push_back(enemyEntity);
 			}
 
 			return scene;
