@@ -52,15 +52,15 @@ namespace tron
 					mGamePad = std::make_unique<Gamepad>(event.deviceID);
 
 					auto const ID{ mGamePad->getID() };
-					InputManager::bindActionToInput("moveRight", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_RIGHT });
-					InputManager::bindActionToInput("moveLeft", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_LEFT });
-					InputManager::bindActionToInput("moveUp", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_UP });
-					InputManager::bindActionToInput("moveDown", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_DOWN });
-					InputManager::bindActionToInput("lookRight", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_RIGHT });
-					InputManager::bindActionToInput("lookLeft", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_LEFT });
-					InputManager::bindActionToInput("lookUp", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_UP });
-					InputManager::bindActionToInput("lookDown", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_DOWN });
-					InputManager::bindActionToInput("shoot", GamepadAxisInput{ ID, GamepadAxis::RIGHT_TRIGGER });
+					InputManager::bindActionToInput("moveRight2", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_RIGHT });
+					InputManager::bindActionToInput("moveLeft2", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_LEFT });
+					InputManager::bindActionToInput("moveUp2", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_UP });
+					InputManager::bindActionToInput("moveDown2", GamepadAxisInput{ ID, GamepadAxis::LEFT_STICK_DOWN });
+					InputManager::bindActionToInput("lookRight2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_RIGHT });
+					InputManager::bindActionToInput("lookLeft2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_LEFT });
+					InputManager::bindActionToInput("lookUp2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_UP });
+					InputManager::bindActionToInput("lookDown2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_STICK_DOWN });
+					InputManager::bindActionToInput("shoot2", GamepadAxisInput{ ID, GamepadAxis::RIGHT_TRIGGER });
 
 					return true;
 				},
@@ -84,12 +84,8 @@ namespace tron
 			}, fro::SystemEventManager::mInputEvent
 		};
 
-		fro::Reference<fro::Scene> mScene1{ fro::SceneManager::addScene() };
-		fro::Reference<fro::Scene> mScene2{ fro::SceneManager::addScene() };
-		fro::Reference<fro::Scene> mScene3{ fro::SceneManager::addScene() };
-
-		fro::Reference<fro::Entity> mTank{ mScene1->addEntity() };
-		fro::Reference<fro::Entity> mCanon{ mScene1->addEntity() };
+		fro::Reference<fro::Entity> mPlayer1{};
+		fro::Reference<fro::Entity> mPlayer2{};
 		std::vector<fro::Reference<fro::Entity>> mEnemies{};
 	};
 }

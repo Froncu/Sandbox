@@ -1,8 +1,9 @@
-#include "Components/PlayerCanonShooter.hpp"
-#include "Components/EnemyMoveAI.hpp"
-#include "Systems/EnemyMoveAISystem.hpp"
+#include "Systems/AIMoveControllerSystem.hpp"
+#include "Systems/AIShootControllerSystem.hpp"
 #include "Systems/NavigatorSystem.hpp"
-#include "Systems/PlayerCanonShooterSystem.hpp"
+#include "Systems/PlayerCanonControllerSystem.hpp"
+#include "Systems/PlayerMoveControllerSystem.hpp"
+#include "Systems/PlayerShootControllerSystem.hpp"
 #include "Tron.hpp"
 
 #if defined FRO_DEBUG
@@ -35,52 +36,31 @@ namespace tron
 	{
 		using namespace fro;
 
-		InputManager::bindActionToInput("moveRight", Key::D);
-		InputManager::bindActionToInput("moveLeft", Key::A);
-		InputManager::bindActionToInput("moveUp", Key::W);
-		InputManager::bindActionToInput("moveDown", Key::S);
-		InputManager::bindActionToInput("lookRight", Key::RIGHT);
-		InputManager::bindActionToInput("lookLeft", Key::LEFT);
-		InputManager::bindActionToInput("lookUp", Key::UP);
-		InputManager::bindActionToInput("lookDown", Key::DOWN);
-		InputManager::bindActionToInput("shoot", Key::SPACE);
+		InputManager::bindActionToInput("moveRight1", Key::D);
+		InputManager::bindActionToInput("moveLeft1", Key::A);
+		InputManager::bindActionToInput("moveUp1", Key::W);
+		InputManager::bindActionToInput("moveDown1", Key::S);
+		InputManager::bindActionToInput("lookRight1", Key::RIGHT);
+		InputManager::bindActionToInput("lookLeft1", Key::LEFT);
+		InputManager::bindActionToInput("lookUp1", Key::UP);
+		InputManager::bindActionToInput("lookDown1", Key::DOWN);
+		InputManager::bindActionToInput("shoot1", Key::SPACE);
 
 		PhysicsSystem::setGravity({});
 
 		ResourceManager::store<Texture>("redTank", mRenderer, Surface{ "Data/Sprites/redTank.png" });
 		ResourceManager::store<Texture>("blueTank", mRenderer, Surface{ "Data/Sprites/blueTank.png" });
+		ResourceManager::store<Texture>("recognizer", mRenderer, Surface{ "Data/Sprites/recognizer.png" });
 		ResourceManager::store<Texture>("canon", mRenderer, Surface{ "Data/Sprites/canon.png" });
-		ResourceManager::store<Texture>("bullet", mRenderer, Surface{ "Data/Sprites/bullet.png" });
-		ResourceManager::store<Texture>("level1", mRenderer, Surface{ "Data/Sprites/level1.png" });
-		ResourceManager::store<Texture>("level2", mRenderer, Surface{ "Data/Sprites/level2.png" });
-		ResourceManager::store<Texture>("level3", mRenderer, Surface{ "Data/Sprites/level3.png" });
+		ResourceManager::store<Texture>("playerBullet", mRenderer, Surface{ "Data/Sprites/playerBullet.png" });
+		ResourceManager::store<Texture>("enemyBullet", mRenderer, Surface{ "Data/Sprites/enemyBullet.png" });
+		ResourceManager::store<Texture>("world1", mRenderer, Surface{ "Data/Sprites/world1.png" });
+		ResourceManager::store<Texture>("world2", mRenderer, Surface{ "Data/Sprites/world2.png" });
+		ResourceManager::store<Texture>("world3", mRenderer, Surface{ "Data/Sprites/world3.png" });
 
-		ResourceManager::store<NavigationMesh>("level1Mesh", SVGParser::parse("Data/SVGs/level1.svg")).translate({ 0.0, 64.0 });
-		ResourceManager::store<NavigationMesh>("level2Mesh", SVGParser::parse("Data/SVGs/level2.svg")).translate({ 0.0, 64.0 });
-		ResourceManager::store<NavigationMesh>("level3Mesh", SVGParser::parse("Data/SVGs/level3.svg")).translate({ 0.0, 64.0 });
-
-		mScene1->addEntity(prefabs::level(1));
-		mScene2->addEntity(prefabs::level(2));
-		mScene3->addEntity(prefabs::level(3));
-
-		*mTank = prefabs::redTank({});
-
-		Reference<Transform> const transform{ *mTank->findComponent<Transform>() };
-		transform->setLocalTranslation({ 240, 256 });
-		*mCanon = prefabs::canon(transform);
-
-		mTank->findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-
-		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 0, 0 }, transform)))->
-			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-		
-		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 600, 600 }, transform)))->
-			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-		
-		mEnemies.emplace_back(mScene1->addEntity(prefabs::blueTankAI({ 100, 400 }, transform)))->
-			findComponent<Navigator>()->setNavigationMesh(*ResourceManager::find<NavigationMesh>("level1Mesh"));
-
-		SceneManager::setActiveScene(*mScene1);
+		ResourceManager::store<NavigationMesh>("world1Mesh", SVGParser::parse("Data/SVGs/world1.svg")).translate({ 0.0, 64.0 });
+		ResourceManager::store<NavigationMesh>("world2Mesh", SVGParser::parse("Data/SVGs/world2.svg")).translate({ 0.0, 64.0 });
+		ResourceManager::store<NavigationMesh>("world3Mesh", SVGParser::parse("Data/SVGs/world3.svg")).translate({ 0.0, 64.0 });
 
 		Logger::info("created Tron!");
 	}
@@ -107,49 +87,30 @@ namespace tron
 
 			if (fro::InputManager::isInputJustPressed(fro::Key::NUMBER_1))
 			{
-				auto activeScene{ fro::SceneManager::getActiveScene() };
+				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
+				if (getActiveScene.valid())
+					fro::SceneManager::removeScene(*getActiveScene);
 
-				mScene1->addEntity(activeScene->removeEntity(*mTank).value());
-				mScene1->addEntity(activeScene->removeEntity(*mCanon).value());
-				mTank->findComponent<Navigator>()->setNavigationMesh(*fro::ResourceManager::find<NavigationMesh>("level1Mesh"));
-
-				fro::SceneManager::setActiveScene(*mScene1);
+				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(1)));
 			}
-
+			
 			if (fro::InputManager::isInputJustPressed(fro::Key::NUMBER_2))
 			{
-				auto activeScene{ fro::SceneManager::getActiveScene() };
+				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
+				if (getActiveScene.valid())
+					fro::SceneManager::removeScene(*getActiveScene);
 
-				mScene2->addEntity(activeScene->removeEntity(*mTank).value());
-				mScene2->addEntity(activeScene->removeEntity(*mCanon).value());
-				mTank->findComponent<Navigator>()->setNavigationMesh(*fro::ResourceManager::find<NavigationMesh>("level2Mesh"));
-
-				fro::SceneManager::setActiveScene(*mScene2);
+				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(2)));
 			}
-
+			
 			if (fro::InputManager::isInputJustPressed(fro::Key::NUMBER_3))
 			{
-				auto activeScene{ fro::SceneManager::getActiveScene() };
+				fro::Reference<fro::Scene const> const getActiveScene{ fro::SceneManager::getActiveScene() };
+				if (getActiveScene.valid())
+					fro::SceneManager::removeScene(*getActiveScene);
 
-				mScene3->addEntity(activeScene->removeEntity(*mTank).value());
-				mScene3->addEntity(activeScene->removeEntity(*mCanon).value());
-				mTank->findComponent<Navigator>()->setNavigationMesh(*fro::ResourceManager::find<NavigationMesh>("level3Mesh"));
-
-				fro::SceneManager::setActiveScene(*mScene3);
+				fro::SceneManager::setActiveScene(fro::SceneManager::addScene(prefabs::level(3)));
 			}
-
-			auto const moveDirection{ fro::InputManager::getActionStrengthAxis2D("moveRight", "moveLeft", "moveDown", "moveUp") };
-			mTank->findComponent<Navigator>()->mDesiredDirection = moveDirection;
-
-			auto lookDirection{ fro::InputManager::getActionStrengthAxis2D("lookRight", "lookLeft", "lookDown", "lookUp") };
-			if (lookDirection.x or lookDirection.y)
-			{
-				auto const canonTransform{ mCanon->findComponent<fro::Transform>() };
-				canonTransform->setWorldRotation(std::atan2(lookDirection.y, lookDirection.x));
-			}
-
-			if (fro::InputManager::isActionJustPressed("shoot"))
-				mCanon->findComponent<PlayerCanonShooter>()->mFire = true;
 
 			fixedUpdateAccumulator += deltaSeconds;
 			while (fixedUpdateAccumulator >= fixedDeltaSeconds)
@@ -159,10 +120,12 @@ namespace tron
 				NavigatorSystem::onFixedUpdate(deltaSeconds);
 			}
 
-			fro::SpriteAnimatorSystem::onUpdate(deltaSeconds);
-			PlayerCanonShooterSystem::onUpdate(deltaSeconds);
+			PlayerMoveControllerSystem::onUpdate(deltaSeconds);
+			PlayerCanonControllerSystem::onUpdate(deltaSeconds);
+			PlayerShootControllerSystem::onUpdate(deltaSeconds);
 
-			EnemyMoveAISystem::onUpdate(deltaSeconds);
+			AIMoveControllerSystem::onUpdate(deltaSeconds);
+			AIShootControllerSystem::onUpdate(deltaSeconds);
 
 			mRenderer.clear();
 			fro::SpriteSystem::onRender(mRenderer);

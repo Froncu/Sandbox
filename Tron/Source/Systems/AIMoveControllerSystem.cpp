@@ -1,10 +1,10 @@
-#include "EnemyMoveAISystem.hpp"
+#include "AIMoveControllerSystem.hpp"
 
 namespace tron
 {
-	void EnemyMoveAISystem::onUpdate(double const deltaSeconds)
+	void AIMoveControllerSystem::onUpdate(double const deltaSeconds)
 	{
-		for (auto&& [entity, transform, navigator, enemyMoveAI] : sGroup)
+		for (auto&& [entity, transform, navigator, controller] : sGroup)
 		{
 			auto const navigationMesh{ navigator->getNavigationMesh() };
 			if (not navigationMesh.valid())
@@ -14,14 +14,14 @@ namespace tron
 			if (nodes.empty())
 				continue;
 
-			double& elapsedSeconds{ enemyMoveAI->elapsedSeconds };
+			double& elapsedSeconds{ controller->elapsedSeconds };
 			elapsedSeconds += deltaSeconds;
 
-			bool& isChasing{ enemyMoveAI->isChasing };
+			bool& isChasing{ controller->isChasing };
 			fro::Vector2<double> const translation{ transform->world().getTranslation() };
-			fro::Vector2<double>& targetPosition{ enemyMoveAI->targetPosition };
+			fro::Vector2<double>& targetPosition{ controller->targetPosition };
 
-			if (double& maxElapsedSeconds{ enemyMoveAI->maxElapsedSeconds };
+			if (double& maxElapsedSeconds{ controller->maxElapsedSeconds };
 				elapsedSeconds >= maxElapsedSeconds)
 			{
 				elapsedSeconds -= maxElapsedSeconds;
@@ -36,7 +36,7 @@ namespace tron
 					targetPosition = translation;
 			}
 
-			auto const& target{ enemyMoveAI->target };
+			auto const& target{ controller->target };
 
 			if (isChasing and target.valid())
 				targetPosition = target->world().getTranslation();
@@ -72,6 +72,6 @@ namespace tron
 		}
 	}
 
-	fro::Group<fro::Transform, Navigator, EnemyMoveAI> EnemyMoveAISystem::sGroup{};
+	fro::Group<fro::Transform, Navigator, AIMoveController> AIMoveControllerSystem::sGroup{};
 
 }

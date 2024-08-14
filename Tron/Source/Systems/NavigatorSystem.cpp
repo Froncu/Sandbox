@@ -90,11 +90,10 @@ namespace tron
 				if (closestNodeIndex == nodeIndex2)
 					std::swap(nodeIndex1, nodeIndex2);
 
-				fro::Vector2<double> const toClosestNode{ nodes[closestNodeIndex].first - translation };
+				fro::Vector2<double> const point21{ nodes[nodeIndex1].first - nodes[nodeIndex2].first };
+				fro::Vector2<double> const toClosestNode{ nodes[nodeIndex1].first - translation };
 
-				if (auto constexpr epsilon{ 1.0 };
-					std::abs(toClosestNode.x) < epsilon and
-					std::abs(toClosestNode.y) < epsilon)
+				if (point21 * toClosestNode < std::numeric_limits<double>().epsilon())
 				{
 					nodeIndex1 = closestNodeIndex;
 					nodeIndex2 = closestNodeIndex;

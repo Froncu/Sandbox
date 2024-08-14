@@ -1,11 +1,11 @@
-#if not defined ENEMY_MOVE_AI_HPP
-#define ENEMY_MOVE_AI_HPP
+#if not defined AI_MOVE_CONTROLLER_HPP
+#define AI_MOVE_CONTROLLER_HPP
 
 #include "Fronge.hpp"
 
 namespace tron
 {
-	struct EnemyMoveAI final : public fro::Component
+	struct AIMoveController final : public fro::Component
 	{
 	public:
 		fro::Reference<fro::Transform const> target{};

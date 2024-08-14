@@ -1,21 +1,21 @@
-#if not defined BULLET_BOUNCER_HPP
-#define BULLET_BOUNCER_HPP
+#if not defined PLAYER_BULLET_COLLIDER_HPP
+#define PLAYER_BULLET_COLLIDER_HPP
 
 #include "Fronge.hpp"
 
 namespace tron
 {
-	class BulletBouncer final : public fro::Component
+	class PlayerBulletCollider final : public fro::Component
 	{
 	public:
-		BulletBouncer() = default;
-		BulletBouncer(BulletBouncer const&) = default;
-		BulletBouncer(BulletBouncer&&) noexcept = default;
+		PlayerBulletCollider() = default;
+		PlayerBulletCollider(PlayerBulletCollider const&) = default;
+		PlayerBulletCollider(PlayerBulletCollider&&) noexcept = default;
 
-		virtual ~BulletBouncer() override = default;
+		virtual ~PlayerBulletCollider() override = default;
 
-		BulletBouncer& operator=(BulletBouncer const&) = default;
-		BulletBouncer& operator=(BulletBouncer&&) noexcept = default;
+		PlayerBulletCollider& operator=(PlayerBulletCollider const&) = default;
+		PlayerBulletCollider& operator=(PlayerBulletCollider&&) noexcept = default;
 
 	private:
 		fro::EventListener<fro::Entity, fro::Component, std::type_index const> mOnComponentAttachEvent

@@ -1,21 +1,21 @@
-#if not defined ENEMY_HPP
-#define ENEMY_HPP
+#if not defined PLAYER_COLLIDER_HPP
+#define PLAYER_COLLIDER_HPP
 
 #include "Fronge.hpp"
 
 namespace tron
 {
-	class Enemy final : public fro::Component
+	class PlayerCollider final : public fro::Component
 	{
 	public:
-		Enemy() = default;
-		Enemy(Enemy const&) = default;
-		Enemy(Enemy&&) noexcept = default;
+		PlayerCollider() = default;
+		PlayerCollider(PlayerCollider const&) = default;
+		PlayerCollider(PlayerCollider&&) noexcept = default;
 
-		virtual ~Enemy() override = default;
+		virtual ~PlayerCollider() override = default;
 
-		Enemy& operator=(Enemy const&) = default;
-		Enemy& operator=(Enemy&&) noexcept = default;
+		PlayerCollider& operator=(PlayerCollider const&) = default;
+		PlayerCollider& operator=(PlayerCollider&&) noexcept = default;
 
 	private:
 		fro::EventListener<fro::Entity, fro::Component, std::type_index const> mOnComponentAttachEvent
@@ -77,19 +77,17 @@ namespace tron
 		{
 			[smartThis = fro::Reference{ this }](fro::Collider const&, fro::Rigidbody const&, fro::Collider const& collider)
 			{
-				if (not (collider.getCategoryBits() & fro::createBitfield(1ull)))
+				if (not (collider.getCategoryBits() & fro::createBitfield(4ull)) and
+					not (collider.getCategoryBits() & fro::createBitfield(5ull)))
 					return false;
 
-				--smartThis->mHealth;
-				if (smartThis->mHealth == 0)
-					smartThis->mParentingEntity->markDoomed();
-
+				smartThis->mParentingEntity->markDoomed();
+				smartThis->mParentingEntity->findComponent<fro::Transform>()->getChildren().front()->getParentingEntity()->markDoomed();
 				return true;
 			}
 		};
 
 		fro::Reference<fro::Entity> mParentingEntity{};
-		std::size_t mHealth{ 3 };
 	};
 }
 
