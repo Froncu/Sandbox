@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(Sandbox)
 
-add_subdirectory(External/Fronge)
+add_subdirectory(Fronge)
 
 if (NOT MSVC)
    message(FATAL_ERROR "This project currently can be build only using Microsoft Visual C++ (MSVC).")
