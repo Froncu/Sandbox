@@ -20,6 +20,9 @@ namespace sbx
 		virtual void run() override;
 
 	private:
+		fro::SystemEventManager mSystemEventManager{};
+		fro::InputManager mInputManager{};
+
 		fro::Window mMainWindow{ "Sandbox", { 1280, 720 } };
 		fro::Renderer mRenderer{ mMainWindow, { 480, 512 } };
 
@@ -49,7 +52,7 @@ namespace sbx
 				{
 					return false;
 				}
-			}, fro::SystemEventManager::mInputEvent
+			}, mSystemEventManager.mInputEvent
 		};
 
 		bool mIsRunning{ true };

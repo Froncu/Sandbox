@@ -7,32 +7,32 @@ if (NOT MSVC)
    message(FATAL_ERROR "This project currently can be build only using Microsoft Visual C++ (MSVC).")
 endif ()
 
-add_executable(Sandbox
+add_executable(${PROJECT_NAME}
    Source/Sandbox.cpp)
 
-target_include_directories(Sandbox PRIVATE
-   Source)
+target_include_directories(${PROJECT_NAME}
+   PRIVATE Source)
 
-target_link_libraries(Sandbox PRIVATE
-   Fronge
-   FrongeEntry)
+target_link_libraries(${PROJECT_NAME}
+   PRIVATE Fronge
+   PRIVATE FrongeEntry)
 
-set_target_properties(Sandbox PROPERTIES
+set_target_properties(${PROJECT_NAME} PROPERTIES
    CXX_STANDARD 20
    CXX_STANDARD_REQUIRED TRUE)
 
-target_compile_options(Sandbox PRIVATE
-   /W4
-   /WX)
+target_compile_options(${PROJECT_NAME}
+   PRIVATE /W4
+   PRIVATE /WX)
 
-add_custom_command(TARGET Sandbox
-   POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+add_custom_command(TARGET ${PROJECT_NAME}
+   POST_BUILD COMMAND
+   ${CMAKE_COMMAND} -E copy_if_different
    $<TARGET_FILE_DIR:Fronge>/Fronge.dll
-   $<TARGET_FILE_DIR:Sandbox>)
+   $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
-add_custom_command(TARGET Sandbox
-   POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+add_custom_command(TARGET ${PROJECT_NAME}
+   POST_BUILD COMMAND
+   ${CMAKE_COMMAND} -E copy_directory_if_different
    ${CMAKE_SOURCE_DIR}/Data
-   $<TARGET_FILE_DIR:Sandbox>/Data)
+   $<TARGET_FILE_DIR:${PROJECT_NAME}>/Data)

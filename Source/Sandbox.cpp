@@ -16,6 +16,8 @@ namespace sbx
 {
 	Sandbox::Sandbox()
 	{
+		mSystemEventManager.mInputEvent.addListener(mInputManager.mOnInputEvent);
+		mSystemEventManager.mWindowEvent.addListener(mMainWindow.mOnWindowEvent);
 		fro::Logger::info("created Sandbox!");
 	}
 
@@ -36,14 +38,14 @@ namespace sbx
 			double const deltaSeconds{ std::chrono::duration<double>(t2 - t1).count() };
 			t1 = t2;
 			
-			fro::InputManager::processInputContinous();
-			fro::SystemEventManager::pollEvents();
+			mInputManager.processInputContinous();
+			mSystemEventManager.pollEvents();
 
 			fixedUpdateAccumulator += deltaSeconds;
 			while (fixedUpdateAccumulator >= fixedDeltaSeconds)
 			{
 				fixedUpdateAccumulator -= fixedDeltaSeconds;
-				fro::PhysicsSystem::onFixedUpdate(fixedDeltaSeconds);
+				// TODO: add physics code
 			}
 
 			mRenderer.clear();
