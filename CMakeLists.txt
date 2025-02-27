@@ -1,21 +1,21 @@
 cmake_minimum_required(VERSION 3.15)
-project(Sandbox)
+project(sandbox)
 
-add_subdirectory(Fronge)
+add_subdirectory(fronge)
 
 if (NOT MSVC)
    message(FATAL_ERROR "This project currently can be build only using Microsoft Visual C++ (MSVC).")
 endif ()
 
 add_executable(${PROJECT_NAME}
-   Source/Sandbox.cpp)
+   source/sandbox.cpp)
 
 target_include_directories(${PROJECT_NAME}
-   PRIVATE Source)
+   PRIVATE source)
 
 target_link_libraries(${PROJECT_NAME}
-   PRIVATE Fronge
-   PRIVATE FrongeEntry)
+   PRIVATE fronge
+   PRIVATE fronge_entry)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
    CXX_STANDARD 20
@@ -28,11 +28,11 @@ target_compile_options(${PROJECT_NAME}
 add_custom_command(TARGET ${PROJECT_NAME}
    POST_BUILD COMMAND
    ${CMAKE_COMMAND} -E copy_if_different
-   $<TARGET_FILE_DIR:Fronge>/Fronge.dll
+   $<TARGET_FILE_DIR:fronge>/fronge.dll
    $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
 add_custom_command(TARGET ${PROJECT_NAME}
    POST_BUILD COMMAND
    ${CMAKE_COMMAND} -E copy_directory_if_different
-   ${CMAKE_SOURCE_DIR}/Data
-   $<TARGET_FILE_DIR:${PROJECT_NAME}>/Data)
+   ${CMAKE_SOURCE_DIR}/resources
+   $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources)

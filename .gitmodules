@@ -1,3 +1,6 @@
 [submodule "Fronge"]
 	path = Fronge
 	url = https://github.com/Froncu/Fronge
+[submodule "fronge"]
+	path = fronge
+	url = https://github.com/Froncu/Fronge
