@@ -20,55 +20,39 @@ namespace sbx
 
    Sandbox::~Sandbox()
    {
-      fro::Locator::reset<fro::SystemEventDispatcher>();
-
       fro::Locator::get<fro::Logger>().info("destroying Sandbox!");
    }
 
    void Sandbox::run()
    {
+      render_context_.change_resizability(true);
+      render_context_.change_scaling_mode(fro::RenderContext::ScalingMode::STRETCH);
+      render_context_.change_resolution({ 400, 240 });
+
+      fro::Texture const& texture{ render_context_.upload_texture(fro::Surface{ "resources/shovel_knight.png" }) };
+      texture.change_linear_filtering(false);
+
       fro::Scene scene{};
-      auto& group{ scene.group<fro::TemplateParameterPack<int, float>, fro::TemplateParameterPack<char>>() };
+      auto& group{ scene.group<fro::Pack<fro::Transform, fro::Sprite>, fro::Pack<>>() };
 
-      fro::Entity& entity_1{ scene.create_entity() };
-      entity_1.add_component<int>(1);
-      entity_1.add_component<float>(1.0f);
-      entity_1.add_component<char>('1');
-
-      fro::Entity& entity_2{ scene.create_entity() };
-      entity_2.add_component<int>(2);
-      entity_2.add_component<float>(2.0f);
-
-      fro::Entity& entity_3{ scene.create_entity() };
-      entity_3.add_component<int>(3);
-      entity_3.add_component<float>(3.0f);
-      entity_3.add_component<char>('3');
-
-      fro::Entity& entity_4{ scene.create_entity() };
-      entity_4.add_component<int>(4);
-      entity_4.add_component<float>(4.0f);
-      entity_4.add_component<char>('4');
+      fro::Entity& entity{ scene.create_entity() };
+      entity.add_component<fro::Transform>();
+      entity.add_component<fro::Sprite>(fro::Reference{ texture },
+         fro::Rectangle{ 0.0, 0.0, 80.0, 51.0 });
 
       scene.execute_queued();
-
-      for (auto&& [entity, integer, character, floating] : group)
-         fro::Locator::get<fro::Logger>().info("integer: {}, character: {}, floating: {}",
-            integer,
-            character,
-            floating);
-
-      scene.destroy_entity(entity_1);
-
-      scene.execute_queued();
-      scene.execute_queued();
-
-      for (auto&& [entity, integer, character, floating] : group)
-         fro::Locator::get<fro::Logger>().info("integer: {}, character: {}, floating: {}",
-            integer,
-            character,
-            floating);
 
       while (run_)
+      {
          fro::Locator::get<fro::SystemEventDispatcher>().poll_events();
+
+         render_context_.clear();
+         for (auto&& [_, transform, sprite] : group)
+         {
+            transform.local_translate({ 0.001, 0.001 });
+            render_context_.render(*sprite.texture, transform.world(), sprite.source_rectangle);
+         }
+         render_context_.present();
+      }
    }
 }
