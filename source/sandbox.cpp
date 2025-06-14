@@ -13,8 +13,6 @@ namespace sbx
    Sandbox::Sandbox()
    {
       fro::Locator::set<fro::Logger, fro::ColouredLogger>();
-      fro::Locator::set<fro::SystemEventDispatcher, fro::RegularSystemEventManager>();
-
       fro::Locator::get<fro::Logger>().info("created Sandbox!");
    }
 
