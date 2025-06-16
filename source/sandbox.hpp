@@ -20,8 +20,6 @@ namespace sbx
          virtual void run() override;
 
       private:
-         fro::RenderContext render_context_{ "Sandbox", { 1280, 720 } };
-
          fro::EventListener<> on_render_context_close_
          {
             [this]
@@ -29,7 +27,7 @@ namespace sbx
                run_ = false;
                return true;
             },
-            render_context_.close_event
+            fro::Locator::set<fro::RenderContext, fro::RenderContext>("Sandbox", fro::Vector2{ 1280, 720 }).close_event
          };
 
          bool run_{ true };

@@ -23,20 +23,20 @@ namespace sbx
 
    void Sandbox::run()
    {
-      render_context_.change_resizability(true);
-      render_context_.change_scaling_mode(fro::RenderContext::ScalingMode::STRETCH);
-      render_context_.change_resolution({ 400, 240 });
+      auto& render_context{ fro::Locator::get<fro::RenderContext>() };
+      render_context.change_resizability(true);
+      render_context.change_scaling_mode(fro::RenderContext::ScalingMode::STRETCH);
+      render_context.change_resolution({ 1280, 720 });
 
-      fro::Texture const& texture{ render_context_.upload_texture(fro::Surface{ "resources/shovel_knight.png" }) };
+      fro::Texture const& texture{ render_context.upload_texture(fro::Surface{ "resources/shovel_knight.png" }) };
       texture.change_linear_filtering(false);
 
       fro::Scene scene{};
       auto& group{ scene.group<fro::Pack<fro::Transform, fro::Sprite>, fro::Pack<>>() };
 
       fro::Entity& entity{ scene.create_entity() };
-      entity.add_component<fro::Transform>();
-      entity.add_component<fro::Sprite>(fro::Reference{ texture },
-         fro::Rectangle{ 0.0, 0.0, 80.0, 51.0 });
+      entity.add_component<fro::Transform>().local_scale({ 4, 4 });
+      entity.add_component<fro::Sprite>(fro::Reference{ texture });
 
       scene.execute_queued();
 
@@ -44,13 +44,13 @@ namespace sbx
       {
          fro::Locator::get<fro::SystemEventDispatcher>().poll_events();
 
-         render_context_.clear();
+         render_context.clear();
          for (auto&& [_, transform, sprite] : group)
          {
             transform.local_translate({ 0.001, 0.001 });
-            render_context_.render(*sprite.texture, transform.world(), sprite.source_rectangle);
+            render_context.render(*sprite.texture, transform.world(), sprite.source_rectangle);
          }
-         render_context_.present();
+         render_context.present();
       }
    }
 }
