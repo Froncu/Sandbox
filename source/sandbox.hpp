@@ -14,8 +14,8 @@ namespace sbx
 
          virtual ~Sandbox() override;
 
-         Sandbox& operator=(Sandbox const&)= delete;
-         Sandbox& operator=(Sandbox&&) noexcept= delete;
+         Sandbox& operator=(Sandbox const&) = delete;
+         Sandbox& operator=(Sandbox&&) noexcept = delete;
 
          virtual void run() override;
 
