@@ -19,13 +19,45 @@ namespace sbx
       render_context.change_scaling_mode(fro::RenderContext::ScalingMode::STRETCH);
       render_context.change_resolution({ 400, 240 });
 
-      fro::Texture const& texture{ render_context.upload_texture(fro::Surface{ "resources/shovel_knight.png" }) };
-      texture.change_linear_filtering(false);
+      fro::Scene const& scene{ fro::Locator::get<fro::SceneManager>().add("scene") };
 
-      fro::Scene& scene{ fro::Locator::get<fro::SceneManager>().add("scene") };
-      fro::Entity& entity{ scene.create_entity() };
-      entity.add_component<fro::Transform>();
-      entity.add_component<fro::Sprite>(fro::Reference{ texture }, fro::Rectangle<double>{ 0, 0, 80, 51 });
+      //
+
+      fro::Entity& entity_a{ scene.create_entity() };
+
+      auto& transform_a{ entity_a.add_component<fro::Transform>() };
+      transform_a.local_translate({ 100.0, 50.0 });
+      transform_a.local_scale({ 1.3, 2.2 });
+
+      auto& rigid_body_a{ entity_a.add_component<fro::RigidBody>() };
+      rigid_body_a.colliders.push_back({ fro::Circle{ 16.0 } });
+      rigid_body_a.inverse_mass = 1.0;
+
+      //
+
+      fro::Entity& entity_b{ scene.create_entity() };
+
+      auto& transform_b{ entity_b.add_component<fro::Transform>() };
+      transform_b.local_translate({ 110.0, 150.0 });
+      transform_b.local_scale({ 2.6, 4.4 });
+
+      auto& rigid_body_b{ entity_b.add_component<fro::RigidBody>() };
+      rigid_body_b.colliders.push_back({ fro::Circle{ 8.0 } });
+      rigid_body_b.inverse_mass = 1.0;
+      rigid_body_b.velocity.y = -50.0;
+
+      //
+
+      fro::Entity& entity_c{ scene.create_entity() };
+
+      auto& transform_c{ entity_c.add_component<fro::Transform>() };
+      transform_c.local_translate({ 50.0, 200.0 });
+      transform_c.local_scale({ 0.65, 2.1 });
+
+      auto& rigid_body_c{ entity_c.add_component<fro::RigidBody>() };
+      rigid_body_c.colliders.push_back({ fro::Circle{ 12.0 } });
+      rigid_body_c.inverse_mass = 1.0;
+      rigid_body_c.velocity.y = -60.0;
    }
 
    Sandbox::~Sandbox()
