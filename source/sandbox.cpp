@@ -22,7 +22,7 @@ namespace sbx
       fro::Texture const& texture{ render_context.upload_texture(fro::Surface{ "resources/shovel_knight.png" }) };
       texture.change_linear_filtering(false);
 
-      fro::Scene& scene{ fro::Locator::get<fro::SceneManager>().add("scene") };
+      fro::Scene const& scene{ fro::Locator::get<fro::SceneManager>().add("scene") };
       fro::Entity& entity{ scene.create_entity() };
       entity.add_component<fro::Transform>();
       entity.add_component<fro::Sprite>(fro::Reference{ texture }, fro::Rectangle<double>{ 0, 0, 80, 51 });
