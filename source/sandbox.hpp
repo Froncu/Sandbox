@@ -31,6 +31,8 @@ namespace sbx
          };
 
          bool run_{ true };
+
+         fro::Reference<fro::RigidBody> polygon_{};
    };
 }
 
