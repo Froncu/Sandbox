@@ -15,9 +15,12 @@ namespace sbx
       fro::Locator::get<fro::Logger>().info("created Sandbox!");
 
       auto& render_context{ fro::Locator::get<fro::RenderContext>() };
+      render_context.change_title("Sandbox");
+      render_context.change_size({ 1280, 720 });
       render_context.change_resizability(true);
       render_context.change_scaling_mode(fro::RenderContext::ScalingMode::STRETCH);
       render_context.change_resolution({ 400, 240 });
+      render_context.change_present_mode(fro::RenderContext::PresentingMode::SINGLE_BUFFERED); 
 
       fro::Scene const& scene{ fro::Locator::get<fro::SceneManager>().add("scene") };
 
@@ -98,6 +101,7 @@ namespace sbx
       auto& system_event_dispatcher{ fro::Locator::get<fro::SystemEventDispatcher>() };
       auto& scene_manager{ fro::Locator::get<fro::SceneManager>() };
       auto& render_context{ fro::Locator::get<fro::RenderContext>() };
+      auto const& editor_ui{ fro::Locator::get<fro::EditorUI>() };
 
       fro::UserInput const& user_input{ fro::Locator::get<fro::InputManager>().user_input(0) };
       user_input.bind_action("move", fro::VectorAction{
@@ -132,6 +136,9 @@ namespace sbx
 
          render_context.clear();
          scene_manager.render();
+         editor_ui.begin_frame();
+         editor_ui.show_demo_window();
+         editor_ui.end_frame();
          render_context.present();
 
          scene_manager.execute_queued();

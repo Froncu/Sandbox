@@ -27,7 +27,7 @@ namespace sbx
                run_ = false;
                return true;
             },
-            fro::Locator::set<fro::RenderContext, fro::RenderContext>("Sandbox", fro::Vector2{ 1280, 720 }).close_event
+            fro::Locator::get<fro::RenderContext>().close_event
          };
 
          bool run_{ true };
