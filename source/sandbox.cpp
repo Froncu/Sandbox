@@ -20,7 +20,7 @@ namespace sbx
       render_context.change_resizability(true);
       render_context.change_scaling_mode(fro::RenderContext::ScalingMode::STRETCH);
       render_context.change_resolution({ 400, 240 });
-      render_context.change_present_mode(fro::RenderContext::PresentingMode::SINGLE_BUFFERED); 
+      render_context.change_present_mode(fro::RenderContext::PresentingMode::SINGLE_BUFFERED);
 
       fro::Scene const& scene{ fro::Locator::get<fro::SceneManager>().add("scene") };
 

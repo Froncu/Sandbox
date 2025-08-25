@@ -13,8 +13,7 @@ target_link_libraries(${PROJECT_NAME}
    PRIVATE $<$<BOOL:${MINGW}>:mingw32>)
 
 target_link_libraries(${PROJECT_NAME}
-   PRIVATE fronge
-   PRIVATE fronge_entry)
+   PRIVATE fronge)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
    CXX_STANDARD 23
@@ -27,7 +26,7 @@ target_compile_options(${PROJECT_NAME}
 add_custom_command(TARGET ${PROJECT_NAME}
    POST_BUILD COMMAND
    ${CMAKE_COMMAND} -E copy_if_different
-   $<TARGET_FILE:fronge>
+   $<TARGET_FILE:fronge_library>
    $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
 add_custom_command(TARGET ${PROJECT_NAME}
