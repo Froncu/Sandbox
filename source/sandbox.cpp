@@ -14,13 +14,16 @@ namespace sbx
    {
       fro::Locator::get<fro::Logger>().info("created Sandbox!");
 
-      auto& render_context{ fro::Locator::get<fro::RenderContext>() };
-      render_context.change_title("Sandbox");
-      render_context.change_size({ 1280, 720 });
-      render_context.change_resizability(true);
-      render_context.change_scaling_mode(fro::RenderContext::ScalingMode::STRETCH);
-      render_context.change_resolution({ 400, 240 });
-      render_context.change_present_mode(fro::RenderContext::PresentingMode::SINGLE_BUFFERED);
+      auto& window{ fro::Locator::get<fro::Window>() };
+      window.change_title("Sandbox");
+      window.change_size({ 1280, 720 });
+      window.change_resizability(true);
+      window.change_visibility(true);
+
+      auto& renderer{ fro::Locator::get<fro::Renderer>() };
+      renderer.change_scaling_mode(fro::Renderer::ScalingMode::STRETCH);
+      renderer.change_resolution({ 400, 240 });
+      renderer.change_present_mode(fro::Renderer::PresentingMode::SINGLE_BUFFERED);
 
       fro::Scene const& scene{ fro::Locator::get<fro::SceneManager>().add("scene") };
 
@@ -30,7 +33,7 @@ namespace sbx
 
       auto& sprite{ entity_a.add_component<fro::Sprite>() };
       sprite.texture =
-         fro::Reference{ render_context.upload_texture(fro::Surface{ "resources/shovel_knight.png" }) };
+         fro::Reference{ renderer.upload_texture(fro::Surface{ "resources/shovel_knight.png" }) };
       sprite.texture->change_linear_filtering(false);
       sprite.source_rectangle = { 0.0, 0.0, 64.0, 64.0 };
       sprite.transform.change_scale({ 0.75, 1.2 });
@@ -100,7 +103,7 @@ namespace sbx
    {
       auto& system_event_dispatcher{ fro::Locator::get<fro::SystemEventDispatcher>() };
       auto& scene_manager{ fro::Locator::get<fro::SceneManager>() };
-      auto& render_context{ fro::Locator::get<fro::RenderContext>() };
+      auto& renderer{ fro::Locator::get<fro::Renderer>() }; 
       auto const& editor_ui{ fro::Locator::get<fro::EditorUI>() };
 
       fro::UserInput const& user_input{ fro::Locator::get<fro::InputManager>().user_input(0) };
@@ -134,12 +137,12 @@ namespace sbx
          fro::Vector2 const strength{ user_input.vector_action_strength("move") };
          polygon_->velocity += strength * 100.0 * delta_seconds;
 
-         render_context.clear();
+         renderer.clear();
          scene_manager.render();
          editor_ui.begin_frame();
          editor_ui.show_demo_window();
          editor_ui.end_frame();
-         render_context.present();
+         renderer.present();
 
          scene_manager.execute_queued();
       }

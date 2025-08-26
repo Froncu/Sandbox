@@ -20,14 +20,14 @@ namespace sbx
          virtual void run() override;
 
       private:
-         fro::EventListener<> on_render_context_close_
+         fro::EventListener<> on_window_close_
          {
             [this]
             {
                run_ = false;
                return true;
             },
-            fro::Locator::get<fro::RenderContext>().close_event
+            fro::Locator::get<fro::Window>().close_event
          };
 
          bool run_{ true };
