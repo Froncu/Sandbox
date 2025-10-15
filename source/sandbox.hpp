@@ -1,7 +1,7 @@
 #ifndef SANDBOX_HPP
 #define SANDBOX_HPP
 
-#include "fronge.hpp"
+#include "fronge/fronge.hpp"
 
 namespace sbx
 {
