@@ -73,7 +73,7 @@ namespace sbx
       transform_c.local_translate({ 50.0, 200.0 });
 
       auto& rigid_body_c{ entity_c.add_component<fro::RigidBody>() };
-      // rigid_body_c.colliders.push_back({ fro::Polygon{ { { -4.0, -4.0 }, { 100.0, -16.0  }, { 4.0, 4.0 }, { -4.0, 4.0 } } }, a });
+      // rigid_body_c.colliders.push_back({ fro::Polygon{ { { -4.0, -4.0 }, { 100.0, -16.0  }, { 4.0, 4.0 }, { -4.0, 4.0 } } } });
       rigid_body_c.colliders.push_back({ fro::Circle{ 16.0 } });
       rigid_body_c.velocity.y = -50.0;
       rigid_body_c.inverse_mass = 1.0 / 2.0;
@@ -89,9 +89,19 @@ namespace sbx
       auto& rigid_body_d{ entity_d.add_component<fro::RigidBody>() };
       // rigid_body_c.colliders.push_back({ fro::Polygon{ { { -4.0, -4.0 }, { 100.0, -16.0  }, { 4.0, 4.0 }, { -4.0, 4.0 } } }, a });
       rigid_body_d.colliders.push_back({ fro::Circle{ 24.0 } });
-      // rigid_body_d.velocity.y = -55.0;
       rigid_body_d.inverse_mass = 0.0 / 3.0;
       rigid_body_d.inverse_inertia = 1.0 / (0.5 * 3.0 * 24.0 * 24.0);
+
+      //
+
+      fro::UserInput const& user_input{ fro::Locator::get<fro::InputManager>().user_input(0) };
+      user_input.bind_action("move", fro::VectorAction{
+         .positive_x_inputs{ fro::Key::D, fro::GamepadAxis::LEFT_STICK_EAST },
+         .negative_x_inputs{ fro::Key::A, fro::GamepadAxis::LEFT_STICK_WEST },
+         .positive_y_inputs{ fro::Key::S, fro::GamepadAxis::LEFT_STICK_SOUTH },
+         .negative_y_inputs{ fro::Key::W, fro::GamepadAxis::LEFT_STICK_NORTH },
+      });
+
    }
 
    Sandbox::~Sandbox()
@@ -105,17 +115,10 @@ namespace sbx
       auto& scene_manager{ fro::Locator::get<fro::SceneManager>() };
       auto& renderer{ fro::Locator::get<fro::Renderer>() }; 
       auto const& editor_ui{ fro::Locator::get<fro::EditorUI>() };
-
       fro::UserInput const& user_input{ fro::Locator::get<fro::InputManager>().user_input(0) };
-      user_input.bind_action("move", fro::VectorAction{
-         .positive_x_inputs{ fro::Key::D, fro::GamepadAxis::LEFT_STICK_EAST },
-         .negative_x_inputs{ fro::Key::A, fro::GamepadAxis::LEFT_STICK_WEST },
-         .positive_y_inputs{ fro::Key::S, fro::GamepadAxis::LEFT_STICK_SOUTH },
-         .negative_y_inputs{ fro::Key::W, fro::GamepadAxis::LEFT_STICK_NORTH },
-      });
 
       auto last_time{ std::chrono::high_resolution_clock::now() };
-      constexpr double fixed_delta_seconds{ 1.0 / 60.0 };
+      double constexpr fixed_delta_seconds{ 1.0 / 60.0 };
       double accumulator{};
       while (run_)
       {
