@@ -17,7 +17,7 @@ namespace sbx
          Sandbox& operator=(Sandbox const&) = delete;
          Sandbox& operator=(Sandbox&&) noexcept = delete;
 
-         virtual void run() override;
+         [[nodiscard]] virtual bool tick() override;
 
       private:
          fro::EventListener<> on_window_close_
@@ -33,6 +33,10 @@ namespace sbx
          bool run_{ true };
 
          fro::Reference<fro::RigidBody> polygon_{};
+
+         std::chrono::high_resolution_clock::time_point last_time_{ std::chrono::high_resolution_clock::now() };
+         double const fixed_delta_seconds_{ 1.0 / 60.0 };
+         double accumulator_{};
    };
 }
 

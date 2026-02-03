@@ -2,9 +2,9 @@
 
 namespace fro
 {
-   std::unique_ptr<Application> create_application()
+   Application* create_application()
    {
-      return std::make_unique<sbx::Sandbox>();
+      return new sbx::Sandbox{};
    }
 }
 
@@ -101,7 +101,6 @@ namespace sbx
          .positive_y_inputs{ fro::Key::S, fro::GamepadAxis::LEFT_STICK_SOUTH },
          .negative_y_inputs{ fro::Key::W, fro::GamepadAxis::LEFT_STICK_NORTH },
       });
-
    }
 
    Sandbox::~Sandbox()
@@ -109,45 +108,34 @@ namespace sbx
       fro::Locator::get<fro::Logger>().info("destroying Sandbox!");
    }
 
-   void Sandbox::run()
+   bool Sandbox::tick()
    {
-      auto& system_event_dispatcher{ fro::Locator::get<fro::SystemEventDispatcher>() };
       auto& scene_manager{ fro::Locator::get<fro::SceneManager>() };
-      auto& renderer{ fro::Locator::get<fro::Renderer>() }; 
-      auto const& editor_ui{ fro::Locator::get<fro::EditorUI>() };
+      auto& renderer{ fro::Locator::get<fro::Renderer>() };
       fro::UserInput const& user_input{ fro::Locator::get<fro::InputManager>().user_input(0) };
 
-      auto last_time{ std::chrono::high_resolution_clock::now() };
-      double constexpr fixed_delta_seconds{ 1.0 / 60.0 };
-      double accumulator{};
-      while (run_)
+      auto const current_time{ std::chrono::high_resolution_clock::now() };
+      double const delta_seconds{ std::chrono::duration<double>{ current_time - last_time_ }.count() };
+      last_time_ = current_time;
+
+      accumulator_ += delta_seconds;
+      while (accumulator_ >= fixed_delta_seconds_)
       {
-         auto const current_time{ std::chrono::high_resolution_clock::now() };
-         double const delta_seconds{ std::chrono::duration<double>{ current_time - last_time }.count() };
-         last_time = current_time;
-
-         system_event_dispatcher.poll_events();
-
-         accumulator += delta_seconds;
-         while (accumulator >= fixed_delta_seconds)
-         {
-            scene_manager.fixed_update(fixed_delta_seconds);
-            accumulator -= fixed_delta_seconds;
-         }
-
-         scene_manager.update(delta_seconds);
-
-         fro::Vector2 const strength{ user_input.vector_action_strength("move") };
-         polygon_->velocity += strength * 100.0 * delta_seconds;
-
-         renderer.clear();
-         scene_manager.render();
-         editor_ui.begin_frame();
-         editor_ui.show_demo_window();
-         editor_ui.end_frame();
-         renderer.present();
-
-         scene_manager.execute_queued();
+         scene_manager.fixed_update(fixed_delta_seconds_);
+         accumulator_ -= fixed_delta_seconds_;
       }
+
+      scene_manager.update(delta_seconds);
+
+      fro::Vector2 const strength{ user_input.vector_action_strength("move") };
+      polygon_->velocity += strength * 100.0 * delta_seconds;
+
+      renderer.clear();
+      scene_manager.render();
+      renderer.present();
+
+      scene_manager.execute_queued();
+
+      return run_;
    }
 }
