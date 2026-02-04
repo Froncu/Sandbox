@@ -8,7 +8,7 @@ namespace sbx
    class Sandbox final : public fro::Application
    {
       public:
-         Sandbox();
+         explicit Sandbox(std::vector<std::string_view> arguments);
          Sandbox(Sandbox const&) = delete;
          Sandbox(Sandbox&&) noexcept = delete;
 

@@ -2,18 +2,16 @@
 
 namespace fro
 {
-   Application* create_application()
+   Application* create_application(std::vector<std::string_view> arguments)
    {
-      return new sbx::Sandbox{};
+      return new sbx::Sandbox{ std::move(arguments) };
    }
 }
 
 namespace sbx
 {
-   Sandbox::Sandbox()
+   Sandbox::Sandbox(std::vector<std::string_view>)
    {
-      fro::Locator::get<fro::Logger>().info("created Sandbox!");
-
       auto& window{ fro::Locator::get<fro::Window>() };
       window.change_title("Sandbox");
       window.change_size({ 1280, 720 });
@@ -105,7 +103,6 @@ namespace sbx
 
    Sandbox::~Sandbox()
    {
-      fro::Locator::get<fro::Logger>().info("destroying Sandbox!");
    }
 
    bool Sandbox::tick()
